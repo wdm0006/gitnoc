@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <meta name="description" content="A Simple Git UI using Git-Pandas">
+    <meta name="author" content="Will McGinnis">
+    <meta name="viewport" content="width=device-width">
+    {% for s in css %}
+        <link href="{{ url_for('static', filename=s) }}" rel="stylesheet" media="screen">
+    {% endfor %}
+    {% block css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% with form=form %}
+{% include "nav.html" %}
+{% endwith %}
+<header>{% block header %}{% endblock %}</header>
+<div class="{% block content_class %}container{% endblock content_class %}">
+    <div role="main">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+{% include "footer.html" %}
+{% for s in base_scripts %}
+    <script src="{{ url_for('static', filename=s) }}"></script>
+{% endfor %}
+{% block scripts %}{% endblock %}
+</body>
+</html>
+

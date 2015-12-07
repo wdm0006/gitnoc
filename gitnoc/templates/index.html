@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<br><br><br>
+<div class="row">
+    <h3>Cumulative Blame</h3>
+    <div class="row">
+        <h5>Authors</h5>
+
+        <div id="chart_cumulative_author_blame" style="width:100%">
+            <svg style="height:500px; width:100%"></svg>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <h5>Projects</h5>
+
+        <div id="chart_cumulative_project_blame" style="width:100%">
+            <svg style="height:500px; width:100%"></svg>
+        </div>
+    </div>
+</div>
+{% endblock %}
