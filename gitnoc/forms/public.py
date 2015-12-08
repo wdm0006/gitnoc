@@ -24,12 +24,8 @@ class SettingsForm(Form):
 
         if self.extensions.data is not None:
             self.extensions.data = [str(x).strip() for x in self.extensions.data.split(',')]
-            if len(self.extensions.data) == 1:
-                self.extensions.data = self.extensions.data[0]
 
         if self.ignore_dir.data is not None:
             self.ignore_dir.data = [str(x).strip() for x in self.ignore_dir.data.split(',')]
-            if len(self.ignore_dir.data) == 1:
-                self.ignore_dir.data = self.ignore_dir.data[0]
 
         return True
