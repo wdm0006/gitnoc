@@ -18,6 +18,8 @@ build/
 develop-eggs/
 dist/
 downloads/
+settings.json
+gitnoc/static/data/*
 eggs/
 .eggs/
 lib/

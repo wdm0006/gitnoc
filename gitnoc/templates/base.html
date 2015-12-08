@@ -28,6 +28,9 @@
         {% block content %}{% endblock %}
     </div>
 </div>
+<br>
+<br>
+<hr>
 {% include "footer.html" %}
 {% for s in base_scripts %}
     <script src="{{ url_for('static', filename=s) }}"></script>

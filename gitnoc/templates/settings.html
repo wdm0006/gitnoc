@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_form %}
+{% block content %}
+    <br><br><br>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Settings</h1>
+            <hr>
+            <p>Here you can configure which directory your projects live in and what to ignore or include. The first thing is
+            the project directory, you have a couple of options:
+            </p>
+            <ul>
+                <li>Enter a single absolute path to the directory that contains one or more git repositories</li>
+                <li>Entire a comma separate list of explicit paths of git repositories to include</li>
+            </ul>
+            <p>For the other two, you can either leave them blank for all extensions and no directories ignored, respectively,
+            or enter a comma separated list of values.</p>
+        </div>
+    </div>
+    <div class="your-form">
+        {{ render_form(form, action_url='/settings', action_text='Update Settings') }}
+    </div>
+{% endblock content %}
