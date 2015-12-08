@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<br><br><br>
+<div class="row">
+    <h1>File Change Rates</h1>
+    <p></p>
+    <div class="row">
+        <table id="file_change_rates_table" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Filename</th>
+                <th>Repo</th>
+                <th># Committers</th>
+                <th>Net Change Rate</th>
+                <th>Abs Change Rate</th>
+                <th>Edit Rate</th>
+                <th>LOC</th>
+                <th>Coverage</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Filename</th>
+                <th>Repo</th>
+                <th># Committers</th>
+                <th>Net Change Rate</th>
+                <th>Abs Change Rate</th>
+                <th>Edit Rate</th>
+                <th>LOC</th>
+                <th>Coverage</th>
+            </tr>
+        </tfoot>
+    </table>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/file_change_rates.js') }}"></script>
+{% endblock %}
