@@ -26,7 +26,8 @@ app.secret_key = 'CHANGEME'
 
 def get_settings():
     try:
-        return json.load(open('settings.json', 'r'))
+        bp = str(os.path.dirname(os.path.abspath(__file__)))
+        return json.load(open(bp + os.sep + 'settings.json', 'r'))
     except:
         return {}
 
@@ -46,7 +47,8 @@ def settings():
             'project_dir': form.project_directory.data,
             'extensions': form.extensions.data
         })
-        json.dump(settings, open('settings.json', 'w'))
+        bp = str(os.path.dirname(os.path.abspath(__file__)))
+        json.dump(settings, open(bp + os.sep + 'settings.json', 'w'))
 
     settings = get_settings()
     extensions = settings.get('extensions', None)
