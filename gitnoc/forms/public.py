@@ -1,8 +1,22 @@
 from flask_wtf import Form
-from wtforms import StringField
+from wtforms import StringField, SelectField
 from wtforms.validators import DataRequired
 
 __author__ = 'willmcginnis'
+
+
+class ProfileForm(Form):
+    profile = SelectField('Profile')
+
+    def __init__(self, *args, **kwargs):
+        super(ProfileForm, self).__init__(*args, **kwargs)
+
+
+class CreateProfileForm(Form):
+    name = StringField('Profile Name')
+
+    def __init__(self, *args, **kwargs):
+        super(CreateProfileForm, self).__init__(*args, **kwargs)
 
 
 class SettingsForm(Form):
@@ -24,8 +38,12 @@ class SettingsForm(Form):
 
         if self.extensions.data is not None:
             self.extensions.data = [str(x).strip() for x in self.extensions.data.split(',')]
+            if self.extensions.data == ['']:
+                self.extensions.data = None
 
         if self.ignore_dir.data is not None:
             self.ignore_dir.data = [str(x).strip() for x in self.ignore_dir.data.split(',')]
+            if self.ignore_dir.data == ['']:
+                self.ignore_dir.data = None
 
         return True

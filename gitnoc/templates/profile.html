@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_form %}
+{% block content %}
+    <br><br><br>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Select Profile</h1>
+            <hr>
+            <p>Here you can select the profile you'd like to use, after which you can edit it. Optionally, you can also
+            make a new profile and select the repos, extensions and directories that define it.</p>
+        </div>
+    </div>
+    <h3>Select and Existing Profile</h3>
+    <div class="your-form">
+        {{ render_form(select_form, action_url='/profile', action_text='Select') }}
+    </div>
+    <h3>Create a New Profile</h3>
+    <div class="your-form">
+        {{ render_form(create_form, action_url='/profile', action_text='Create') }}
+    </div>
+{% endblock content %}

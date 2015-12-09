@@ -42,6 +42,6 @@ var cumulative_project_blame = function (cpb_data) {
   });
 };
 
-d3.json("./static/data/cumulative_author_blame.json", cumulative_author_blame);
-d3.json("./static/data/cumulative_project_blame.json", cumulative_project_blame);
+d3.json("/cumulative_author_blame_data", cumulative_author_blame);
+d3.json("/cumulative_project_blame_data", cumulative_project_blame);
 
