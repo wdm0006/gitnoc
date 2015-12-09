@@ -1,7 +1,7 @@
 var cumulative_author_blame = function (cab_data) {
   nv.addGraph(function() {
     var cab_chart = nv.models.stackedAreaChart()
-                      .margin({right: 0})
+                      .margin({right: 100})
                       .x(function(d) { return d[0] })
                       .y(function(d) { return d[1] })
                       .useInteractiveGuideline(true)
@@ -23,7 +23,7 @@ var cumulative_author_blame = function (cab_data) {
 var cumulative_project_blame = function (cpb_data) {
   nv.addGraph(function() {
     var cpb_chart = nv.models.stackedAreaChart()
-                      .margin({right: 0})
+                      .margin({right: 100})
                       .x(function(d) { return d[0] })
                       .y(function(d) { return d[1] })
                       .useInteractiveGuideline(true)
