@@ -1,8 +1,12 @@
-from flask import Flask, render_template, redirect, url_for, request
 import json
 import os
+from flask import Flask, render_template, redirect, url_for, request
 from gitpandas import ProjectDirectory
+from redis import Redis
+from rq import Queue
 from gitnoc.forms.public import SettingsForm, ProfileForm, CreateProfileForm
+from gitnoc.services.services import get_settings, get_profiles, get_file_prefix, create_profile, change_profile, update_profile
+from gitnoc.services.cumulative_blame import cumulative_blame, BlameThread
 
 TITLE = "GitNOC"
 
@@ -30,83 +34,7 @@ directory = str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' 
 if not os.path.exists(directory):
     os.makedirs(directory)
 
-
-def get_settings():
-    try:
-        bp = str(os.path.dirname(os.path.abspath(__file__)))
-        configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-        for config in configs:
-            if config.get('current_profile', False):
-                return config
-        return {}
-    except:
-        return {}
-
-
-def get_profiles():
-    try:
-        bp = str(os.path.dirname(os.path.abspath(__file__)))
-        configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-        choices = []
-        for config in configs:
-            choices.append((config.get('profile_name', ''), config.get('profile_name', '')))
-        return choices
-    except:
-        return []
-
-
-def get_file_prefix():
-    try:
-        bp = str(os.path.dirname(os.path.abspath(__file__)))
-        configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-        for config in configs:
-            if config.get('current_profile', False):
-                return config.get('profile_name', '').replace(' ', '_') + '_'
-        return ''
-    except:
-        return ''
-
-
-def create_profile(profile_name):
-    bp = str(os.path.dirname(os.path.abspath(__file__)))
-    configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-    configs.append({
-        "profile_name": profile_name,
-        "current_profile": False,
-        "extensions": None,
-        "ignore_dir": None,
-        "project_dir": None
-    })
-    json.dump(configs, open(bp + os.sep + 'settings.json', 'w'), indent=4)
-    return True
-
-
-def change_profile(profile_name):
-    bp = str(os.path.dirname(os.path.abspath(__file__)))
-    configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-    out = []
-    for config in configs:
-        if config.get('current_profile', True):
-            config['current_profile'] = False
-        if config.get('profile_name', '') == profile_name:
-            config['current_profile'] = True
-        out.append(config)
-    json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
-    return True
-
-
-def update_profile(project_dir, extensions, ignore_dir):
-    bp = str(os.path.dirname(os.path.abspath(__file__)))
-    configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-    out = []
-    for config in configs:
-        if config.get('current_profile', False):
-            config['project_dir'] = project_dir
-            config['extensions'] = extensions
-            config['ignore_dir'] = ignore_dir
-        out.append(config)
-    json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
-    return True
+q = Queue(connection=Redis())
 
 
 @app.route('/', methods=["GET"])
@@ -165,68 +93,30 @@ def settings():
 @app.route('/cumulative_author_blame_data', methods=['GET'])
 def cumulative_author_blame_data():
     filename = get_file_prefix() + 'cumulative_author_blame.json'
-    return json.dumps(json.load(open(str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'r')))
+    try:
+        return json.dumps(json.load(open(str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'r')))
+    except FileNotFoundError as e:
+        return '{}'
 
 
 @app.route('/cumulative_author_blame', methods=['GET'])
 def cumulative_author_blame():
-    settings = get_settings()
-    project_dir = settings.get('project_dir', os.getcwd())
-    extensions = settings.get('extensions', None)
-    ignore_dir = settings.get('ignore_dir', None)
-
-    repo = ProjectDirectory(working_dir=project_dir)
-    cb = repo.cumulative_blame(extensions=extensions, ignore_dir=ignore_dir)
-    cb = cb[~cb.index.duplicated()]
-    t = json.loads(cb.to_json(orient='columns'))
-
-    d3_data = []
-    for committer in t.keys():
-        blob = dict()
-        blob['key'] = committer
-        blob['values'] = []
-        for data_point in t[committer].keys():
-            blob['values'].append([int(float(data_point)), t[committer][data_point]])
-            blob['values'] = sorted(blob['values'], key=lambda x: x[0])
-        d3_data.append(blob)
-
-    # dump the data to disk
-    filename = get_file_prefix() + 'cumulative_author_blame.json'
-    json.dump(d3_data, open(str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'w'), indent=4)
+    q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json')
     return redirect(url_for('index'))
 
 
 @app.route('/cumulative_project_blame_data', methods=['GET'])
 def cumulative_project_blame_data():
     filename = get_file_prefix() + 'cumulative_project_blame.json'
-    return json.dumps(json.load(open(str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'r')))
+    try:
+        return json.dumps(json.load(open(str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'r')))
+    except FileNotFoundError as e:
+        return '{}'
 
 
 @app.route('/cumulative_project_blame', methods=['GET'])
 def cumulative_project_blame():
-    settings = get_settings()
-    project_dir = settings.get('project_dir', os.getcwd())
-    extensions = settings.get('extensions', None)
-    ignore_dir = settings.get('ignore_dir', None)
-
-    repo = ProjectDirectory(working_dir=project_dir)
-    cb = repo.cumulative_blame(extensions=extensions, ignore_dir=ignore_dir, by='project')
-    cb = cb[~cb.index.duplicated()]
-    t = json.loads(cb.to_json(orient='columns'))
-
-    d3_data = []
-    for committer in t.keys():
-        blob = dict()
-        blob['key'] = committer
-        blob['values'] = []
-        for data_point in t[committer].keys():
-            blob['values'].append([int(float(data_point)), t[committer][data_point]])
-            blob['values'] = sorted(blob['values'], key=lambda x: x[0])
-        d3_data.append(blob)
-
-    # dump the data to disk
-    filename = get_file_prefix() + 'cumulative_project_blame.json'
-    json.dump(d3_data, open(str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'w'), indent=4)
+    q.enqueue(cumulative_blame, 'committer', 'cumulative_project_blame.json')
     return redirect(url_for('index'))
 
 

@@ -3,3 +3,5 @@ git+https://github.com/wdm0006/git-pandas.git
 Flask-WTF==0.11
 WTForms==2.0.2
 wtforms-components
+Redis >= 2.6.0
+rq

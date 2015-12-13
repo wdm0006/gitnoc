@@ -8,7 +8,7 @@
     these datastores, click the refresh button below each plot and wait for a while for the results to be visible.</p>
     <div class="row">
         <h3>Authors</h3>
-        <a href="{{url_for('cumulative_author_blame')}}"><button>Refresh</button></a>
+        <a href="{{url_for('cumulative_author_blame')}}"><button onclick="backgroundTaskAlert()">Refresh</button></a>
         <div id="chart_cumulative_author_blame" style="width:100%">
             <svg style="height:500px; width:100%"></svg>
         </div>
@@ -16,7 +16,7 @@
     <hr>
     <div class="row">
         <h3>Projects</h3>
-        <a href="{{url_for('cumulative_project_blame')}}"><button>Refresh</button></a>
+        <a href="{{url_for('cumulative_project_blame')}}"><button onclick="backgroundTaskAlert()">Refresh</button></a>
         <div id="chart_cumulative_project_blame" style="width:100%">
             <svg style="height:500px; width:100%"></svg>
         </div>
@@ -24,5 +24,10 @@
 </div>
 {% endblock %}
 {% block scripts %}
+    <script>
+        function backgroundTaskAlert() {
+            alert("These refreshes can take quite a while, so we are going to do it in the background.  You won't see a new plot right away, but should soon!");
+        }
+    </script>
     <script src="{{ url_for('static', filename='js/cumulative_blame.js') }}"></script>
 {% endblock %}
