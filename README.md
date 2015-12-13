@@ -1,7 +1,7 @@
 GitNOC
 ======
 
-![Cumulative Blame Stravalib](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/gitnoc.png)
+![Cumulative Blame Stravalib](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/cumulative_blame_example.png)
 
 A simple dashboard with Git statistics for teams and organizations. Currently in development, but operational. Is heavily
 based on git-pandas.  The general architecture is:
@@ -32,6 +32,11 @@ by git-pandas. Initial functionality is:
 In the future we aim to add more project level type of analysis for helping to manage groups of people all working in 
 multiple git repositories towards some (hopefully) common goal.
 
+TODO:
+
+ * When no data is found for graphs, put something telling the user that on screen
+ * When new data is being computed, put something telling the user that on screen
+ 
 How to Install
 ==============
 
