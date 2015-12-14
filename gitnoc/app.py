@@ -101,7 +101,7 @@ def cumulative_author_blame_data():
 
 @app.route('/cumulative_author_blame', methods=['GET'])
 def cumulative_author_blame():
-    q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json')
+    q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json', timeout=6000)
     return redirect(url_for('index'))
 
 
@@ -116,7 +116,7 @@ def cumulative_project_blame_data():
 
 @app.route('/cumulative_project_blame', methods=['GET'])
 def cumulative_project_blame():
-    q.enqueue(cumulative_blame, 'committer', 'cumulative_project_blame.json')
+    q.enqueue(cumulative_blame, 'project', 'cumulative_project_blame.json', timeout=6000)
     return redirect(url_for('index'))
 
 
@@ -132,7 +132,7 @@ def file_change_rates():
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
     repo = ProjectDirectory(working_dir=project_dir)
-    cb = repo.file_change_rates(extensions=extensions, ignore_dir=ignore_dir, coverage=True)
+    cb = repo.file_change_rates(extensions=extensions, ignore_dir=ignore_dir, coverage=True, limit=100)
     cb.reset_index(level=0, inplace=True)
     data = json.loads(cb.to_json(orient='records'))
 
