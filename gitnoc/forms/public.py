@@ -34,7 +34,8 @@ class SettingsForm(Form):
 
         self.project_directory.data = [str(x).strip() for x in self.project_directory.data.split(',')]
         if len(self.project_directory.data) == 1:
-            self.project_directory.data = self.project_directory.data[0]
+            if self.project_directory.data[0][-1] == '/':
+                self.project_directory.data = self.project_directory.data[0]
 
         if self.extensions.data is not None:
             self.extensions.data = [str(x).strip() for x in self.extensions.data.split(',')]

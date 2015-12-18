@@ -14,7 +14,7 @@ def cumulative_blame(by, file_stub):
     ignore_dir = settings.get('ignore_dir', None)
 
     repo = ProjectDirectory(working_dir=project_dir)
-    cb = repo.cumulative_blame(extensions=extensions, ignore_dir=ignore_dir, by=by)
+    cb = repo.cumulative_blame(extensions=extensions, ignore_dir=ignore_dir, by=by, num_datapoints=100)
     cb = cb[~cb.index.duplicated()]
     t = json.loads(cb.to_json(orient='columns'))
 
