@@ -38,8 +38,13 @@ q = Queue(connection=Redis())
 
 
 @app.route('/', methods=["GET"])
-def index():
-    return render_template('index.html', title=TITLE, base_scripts=scripts, css=css)
+def metrics():
+    return render_template('metrics.html', title=TITLE, base_scripts=scripts, css=css)
+
+
+@app.route('/blame', methods=["GET"])
+def blame():
+    return render_template('blame.html', title=TITLE, base_scripts=scripts, css=css)
 
 
 @app.route('/profile', methods=["GET", "POST"])
@@ -102,7 +107,7 @@ def cumulative_author_blame_data():
 @app.route('/cumulative_author_blame', methods=['GET'])
 def cumulative_author_blame():
     q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json', timeout=6000)
-    return redirect(url_for('index'))
+    return redirect(url_for('blame'))
 
 
 @app.route('/cumulative_project_blame_data', methods=['GET'])
@@ -117,7 +122,7 @@ def cumulative_project_blame_data():
 @app.route('/cumulative_project_blame', methods=['GET'])
 def cumulative_project_blame():
     q.enqueue(cumulative_blame, 'project', 'cumulative_project_blame.json', timeout=6000)
-    return redirect(url_for('index'))
+    return redirect(url_for('blame'))
 
 
 @app.route('/risk', methods=['GET', 'POST'])
