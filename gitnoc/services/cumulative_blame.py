@@ -2,7 +2,7 @@ import os
 import json
 import threading
 from gitpandas import ProjectDirectory
-from gitnoc.services.services import get_settings, get_file_prefix
+from gitnoc.services.settings import get_settings, get_file_prefix
 
 __author__ = 'willmcginnis'
 
@@ -17,7 +17,7 @@ def cumulative_blame(by, file_stub):
     print(extensions)
     print(ignore_dir)
     print(by)
-    cb = repo.cumulative_blame(branch='master', extensions=extensions, ignore_dir=ignore_dir, by=by, num_datapoints=100, skip=None, limit=None)
+    cb = repo.cumulative_blame(branch='master', extensions=extensions, ignore_dir=ignore_dir, by=by, num_datapoints=None, skip=None, limit=100)
     cb = cb[~cb.index.duplicated()]
     t = json.loads(cb.to_json(orient='columns'))
 

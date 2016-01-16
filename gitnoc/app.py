@@ -5,7 +5,7 @@ from gitpandas import ProjectDirectory
 from redis import Redis
 from rq import Queue
 from gitnoc.forms.public import SettingsForm, ProfileForm, CreateProfileForm
-from gitnoc.services.services import get_settings, get_profiles, get_file_prefix, create_profile, change_profile, update_profile
+from gitnoc.services.settings import get_settings, get_profiles, get_file_prefix, create_profile, change_profile, update_profile
 from gitnoc.services.cumulative_blame import cumulative_blame, BlameThread
 
 TITLE = "GitNOC"
