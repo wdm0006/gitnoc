@@ -7,17 +7,67 @@
     <hr>
     <div class="col-lg-4">
         <h3>Top Committers</h3>
-    </div>
-    <div class="col-lg-4">
-        <h3>Top Repos</h3>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+                <th>#</th>
+                <th>Committer</th>
+                <th>Net Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for x in leaderboard.top_committers %}
+            <tr>
+                <th>{{x.rank}}</th>
+                <th>{{x.label}}</th>
+                <th>{{x.net}}</th>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
     </div>
     <div class="col-lg-4">
         <h3>Top Extensions</h3>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+                <th>#</th>
+                <th>Committer</th>
+                <th>Net Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for x in leaderboard.top_extensions %}
+            <tr>
+                <th>{{x.rank}}</th>
+                <th>*.{{x.label}}</th>
+                <th>{{x.net}}</th>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
     </div>
-</div>
-<div class="row">
-    <h2>Week Retrospective</h2>
-    <hr>
+    <div class="col-lg-4">
+        <h3>Top Repositories</h3>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+                <th>#</th>
+                <th>Committer</th>
+                <th>Net Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for x in leaderboard.top_repositories %}
+            <tr>
+                <th>{{x.rank}}</th>
+                <th>{{x.label}}</th>
+                <th>{{x.net}}</th>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 {% block scripts %}

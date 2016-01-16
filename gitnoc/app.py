@@ -5,8 +5,10 @@ from gitpandas import ProjectDirectory
 from redis import Redis
 from rq import Queue
 from gitnoc.forms.public import SettingsForm, ProfileForm, CreateProfileForm
-from gitnoc.services.settings import get_settings, get_profiles, get_file_prefix, create_profile, change_profile, update_profile
-from gitnoc.services.cumulative_blame import cumulative_blame, BlameThread
+from gitnoc.services.settings import *
+from gitnoc.services.cumulative_blame import *
+from gitnoc.services.file_change_rates import *
+from gitnoc.services.metrics import *
 
 TITLE = "GitNOC"
 
@@ -39,7 +41,8 @@ q = Queue(connection=Redis())
 
 @app.route('/', methods=["GET"])
 def metrics():
-    return render_template('metrics.html', title=TITLE, base_scripts=scripts, css=css)
+    leaderboard = week_leader_board(n=5)
+    return render_template('metrics.html', leaderboard=leaderboard, title=TITLE, base_scripts=scripts, css=css)
 
 
 @app.route('/blame', methods=["GET"])
@@ -132,21 +135,7 @@ def risk():
 
 @app.route('/file_change_rates', methods=['GET'])
 def file_change_rates():
-    settings = get_settings()
-    project_dir = settings.get('project_dir', os.getcwd())
-    extensions = settings.get('extensions', None)
-    ignore_dir = settings.get('ignore_dir', None)
-    repo = ProjectDirectory(working_dir=project_dir)
-    cb = repo.file_change_rates(extensions=extensions, ignore_dir=ignore_dir, coverage=True, limit=100)
-    cb.reset_index(level=0, inplace=True)
-    data = json.loads(cb.to_json(orient='records'))
-
-    output = {'data': []}
-    for blob in data:
-        row = [blob.get(x, None) for x in ['index', 'repository', 'unique_committers', 'net_rate_of_change', 'abs_rate_of_change', 'edit_rate', 'total_lines', 'coverage']]
-        row = [round(x, 2) if isinstance(x, float) else x for x in row]
-        output['data'].append(row)
-
+    output = get_file_change_rates()
     return json.dumps(output)
 
 if __name__ == "__main__":
