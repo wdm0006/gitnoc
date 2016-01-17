@@ -18,9 +18,7 @@ def get_file_change_rates():
 
     output = {'data': []}
     for blob in data:
-        row = [blob.get(x, None) for x in ['index', 'repository', 'unique_committers', 'net_rate_of_change',
-                                           'abs_rate_of_change', 'edit_rate', 'total_lines', 'coverage']]
-
+        row = [blob.get(x, None) for x in ['index', 'repository', 'unique_committers', 'net_rate_of_change', 'edit_rate', 'total_lines', 'coverage']]
         row = [round(x, 2) if isinstance(x, float) else x for x in row]
         output['data'].append(row)
 

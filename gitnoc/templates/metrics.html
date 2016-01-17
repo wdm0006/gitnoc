@@ -3,7 +3,7 @@
 <br><br><br>
 <h1>Metrics</h1>
 <div class="row">
-    <h2>Week Leaderboard</h2>
+    <h2>Leaderboard <small>(past 7 days, by net change)</small></h2>
     <hr>
     <div class="col-lg-4">
         <h3>Top Committers</h3>
@@ -68,7 +68,23 @@
           </tbody>
         </table>
     </div>
-</div>
+    </div>
+
+
+    <div class="row">
+       <h2>Punchcard</h2>
+        <hr>
+        <div class="container">
+            <div class="well">
+                <div id="graph-wrapper">
+                  <div id="graph"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <hr>
 {% endblock %}
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/punchcard.js') }}"></script>
 {% endblock %}

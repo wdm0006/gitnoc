@@ -5,3 +5,4 @@ WTForms==2.0.2
 wtforms-components
 Redis >= 2.6.0
 rq
+Flask-Cache

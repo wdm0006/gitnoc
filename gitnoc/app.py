@@ -1,9 +1,8 @@
-import json
-import os
 from flask import Flask, render_template, redirect, url_for, request
-from gitpandas import ProjectDirectory
 from redis import Redis
 from rq import Queue
+from flask_cache import Cache
+
 from gitnoc.forms.public import SettingsForm, ProfileForm, CreateProfileForm
 from gitnoc.services.settings import *
 from gitnoc.services.cumulative_blame import *
@@ -31,6 +30,7 @@ css = [
 
 app = Flask(__name__)
 app.secret_key = 'CHANGEME'
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 directory = str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' + os.sep + 'data'
 if not os.path.exists(directory):
@@ -39,15 +39,20 @@ if not os.path.exists(directory):
 q = Queue(connection=Redis())
 
 
+def render_wrapper(template, **kwargs):
+    current_profile = get_settings()['profile_name']
+    return render_template(template, title=TITLE, base_scripts=scripts, css=css, profile_name=current_profile, **kwargs)
+
+
 @app.route('/', methods=["GET"])
 def metrics():
     leaderboard = week_leader_board(n=5)
-    return render_template('metrics.html', leaderboard=leaderboard, title=TITLE, base_scripts=scripts, css=css)
+    return render_wrapper('metrics.html', leaderboard=leaderboard)
 
 
 @app.route('/blame', methods=["GET"])
 def blame():
-    return render_template('blame.html', title=TITLE, base_scripts=scripts, css=css)
+    return render_wrapper('blame.html')
 
 
 @app.route('/profile', methods=["GET", "POST"])
@@ -66,36 +71,48 @@ def profile():
         return redirect(url_for('settings'))
 
     select_form.profile.choices = get_profiles()
+    select_form.profile.default = get_settings()['profile_name']
     select_form.process()
 
-    return render_template('profile.html', create_form=create_form, select_form=select_form, title=TITLE, base_scripts=scripts, css=css)
+    return render_wrapper('profile.html', create_form=create_form, select_form=select_form)
 
 
 @app.route('/settings', methods=["GET", "POST"])
 def settings():
-    form = SettingsForm(request.form)
+    form = SettingsForm(request.form, csrf_enabled=False)
     if form.validate_on_submit():
         update_profile(form.project_directory.data, form.extensions.data, form.ignore_dir.data)
 
     settings = get_settings()
     extensions = settings.get('extensions', None)
-    if extensions is not None:
-        form.extensions.default = ', '.join(extensions)
-
     project_dir = settings.get('project_dir', None)
+    ignore_dir = settings.get('ignore_dir', None)
+
     if project_dir is not None:
         if isinstance(project_dir, list):
-            form.project_directory.default = ', '.join(project_dir)
+            pdv = ','.join(project_dir)
         else:
-            form.project_directory.default = project_dir
+            pdv = project_dir
+    else:
+        pdv = ''
 
-    ignore_dir = settings.get('ignore_dir', None)
+    if extensions is not None:
+        if isinstance(project_dir, list):
+            ext = ','.join(extensions)
+        else:
+            ext = extensions
+    else:
+        ext = ''
+
     if ignore_dir is not None:
-        form.ignore_dir.default = ', '.join(ignore_dir)
+        if isinstance(project_dir, list):
+            ign = ','.join(ignore_dir)
+        else:
+            ign = ignore_dir
+    else:
+        ign = ''
 
-    form.process()
-
-    return render_template('settings.html', form=form, title=TITLE, base_scripts=scripts, css=css)
+    return render_wrapper('settings.html', form=form, project_directory_values=pdv, ignore_dir_values=ign, extensions_values=ext)
 
 
 @app.route('/cumulative_author_blame_data', methods=['GET'])
@@ -130,13 +147,21 @@ def cumulative_project_blame():
 
 @app.route('/risk', methods=['GET', 'POST'])
 def risk():
-    return render_template('filechangerates.html', title=TITLE, base_scripts=scripts, css=css)
+    return render_wrapper('filechangerates.html')
 
 
 @app.route('/file_change_rates', methods=['GET'])
+@cache.cached(timeout=300)
 def file_change_rates():
     output = get_file_change_rates()
     return json.dumps(output)
+
+
+@app.route('/punchcard_data', methods=['GET'])
+@cache.cached(timeout=300)
+def punchchard_data():
+    output = get_punchcard()
+    return str(output)
 
 if __name__ == "__main__":
     app.run(debug=True)

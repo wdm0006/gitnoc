@@ -17,7 +17,7 @@ def cumulative_blame(by, file_stub):
     print(extensions)
     print(ignore_dir)
     print(by)
-    cb = repo.cumulative_blame(branch='master', extensions=extensions, ignore_dir=ignore_dir, by=by, num_datapoints=None, skip=None, limit=100)
+    cb = repo.cumulative_blame(branch='master', extensions=extensions, ignore_dir=ignore_dir, by=by, num_datapoints=100, skip=None, limit=None)
     cb = cb[~cb.index.duplicated()]
     t = json.loads(cb.to_json(orient='columns'))
 
@@ -36,40 +36,3 @@ def cumulative_blame(by, file_stub):
     json.dump(d3_data, open(str(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'w'), indent=4)
 
     return True
-
-
-class BlameThread(threading.Thread):
-    def __init__(self, by, file_stub):
-        super(BlameThread, self).__init__()
-        self.daemon = True
-        self.__monitor = threading.Event()
-        self.__monitor.set()
-        self.__has_shutdown = False
-        self.by = by
-        self.file_stub = file_stub
-
-    def run(self):
-        self.startup()
-        while self.isRunning():
-            self.mainloop()
-        self.cleanup()
-        self.__has_shutdown = True
-
-    def stop(self):
-        self.__monitor.clear()
-
-    def isRunning(self):
-        return self.__monitor.isSet()
-
-    def isShutdown(self):
-        return self.__has_shutdown
-
-    def mainloop(self):
-        cumulative_blame(self.by, self.file_stub)
-        self.stop()
-
-    def startup(self):
-        pass
-
-    def cleanup(self):
-        pass

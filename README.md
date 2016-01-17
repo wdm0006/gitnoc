@@ -12,7 +12,7 @@ based on git-pandas.  The general architecture is:
  * rq and redis for background tasks
  
 The aim is to have a simple UI that can run on local host and visualize the interesting project-level analytics made possible
-by git-pandas. Initial functionality is:
+by git-pandas. Current functionality is:
 
  * Multiple settings profiles configurable, in each profile, you can set:
     * a git repository or group of git repositories to analyze
@@ -28,6 +28,9 @@ by git-pandas. Initial functionality is:
     * coverage (if available)
     * LOC
     * Number of unique committers
+ * Metrics Tab
+    * Leader board for top weekly committers, extensions, and repositories
+    * Aggregated punchcard for all projects in profile
     
 In the future we aim to add more project level type of analysis for helping to manage groups of people all working in 
 multiple git repositories towards some (hopefully) common goal.
