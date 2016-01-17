@@ -1,7 +1,7 @@
 GitNOC
 ======
 
-![Cumulative Blame Stravalib](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/cumulative_blame_example.png)
+![Metrics Example](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/metrics_example.png)
 
 A simple dashboard with Git statistics for teams and organizations. Currently in development, but operational. Is heavily
 based on git-pandas.  The general architecture is:
@@ -61,3 +61,16 @@ For long tasks, we use redis and rq, so be sure to have a redis server up:
 Finally, to run, make sure you also have an rqworker running from this directory:
 
     $rqworker
+
+Screenshots
+===========
+
+![Metrics Example](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/metrics_example.png)
+
+![Cumulative Blame Example](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/cumulative_blame_example.png)
+
+![Risk Example](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/risk_example.png)
+
+![Profile Select Example](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/profile_select_example.png)
+
+![Settings Example](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/settings_example.png)
