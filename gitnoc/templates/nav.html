@@ -7,19 +7,19 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{url_for('metrics')}}">
+            <a class="navbar-brand" href="{{url_for('metrics.metrics')}}">
                 {{ title }}
             </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="{{url_for('metrics')}}">Metrics</a></li>
-                <li><a href="{{url_for('blame')}}">Blame</a></li>
-                <li><a href="{{url_for('risk')}}">Risk</a></li>
-                <li><a href="{{url_for('profile')}}">Settings</a></li>
+                <li><a href="{{url_for('metrics.metrics')}}">Metrics</a></li>
+                <li><a href="{{url_for('blame.blame')}}">Blame</a></li>
+                <li><a href="{{url_for('risk.risk')}}">Risk</a></li>
+                <li><a href="{{url_for('admin.profile')}}">Settings</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="{{url_for('settings')}}">Current Profile: {{profile_name}}</a></li>
+              <li><a href="{{url_for('admin.settings')}}">Current Profile: {{profile_name}}</a></li>
             </ul>
         </div>
     </div>

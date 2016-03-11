@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block content %}
+    <br><br><br>
+    <h1>Metrics</h1>
+    <div class="row">
+        <h2>Leaderboard
+            <small>(past 7 days, by net change)</small>
+        </h2>
+        <hr>
+        <div class="col-lg-4">
+            <h3>Top Committers</h3>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Committer</th>
+                    <th>Net Change</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for x in leaderboard.top_committers %}
+                    <tr>
+                        <th>{{ x.rank }}</th>
+                        <th>{{ x.label }}</th>
+                        <th>{{ x.net }}</th>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-4">
+            <h3>Top Extensions</h3>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Committer</th>
+                    <th>Net Change</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for x in leaderboard.top_extensions %}
+                    <tr>
+                        <th>{{ x.rank }}</th>
+                        <th>*.{{ x.label }}</th>
+                        <th>{{ x.net }}</th>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-4">
+            <h3>Top Repositories</h3>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Committer</th>
+                    <th>Net Change</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for x in leaderboard.top_repositories %}
+                    <tr>
+                        <th>{{ x.rank }}</th>
+                        <th>{{ x.label }}</th>
+                        <th>{{ x.net }}</th>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#details" role="tab" data-toggle="tab">Details</a></li>
+        <li><a href="#punchcard" role="tab" data-toggle="tab">Punchcard</a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="details">
+            <div class="row">
+                <hr>
+                <div class="container">
+                    <h2>Repository Details</h2>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Repository Name</th>
+                            <th>Details</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for x in repo_names %}
+                            <tr>
+                                <th>{{ x }}</th>
+                                <th><a class="btn btn-md btn-success"
+                                       href="{{ url_for('metrics.repo_details', repo_name=x) }}">details</a></th>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="punchcard">
+            <div class="row">
+                <hr>
+                <div class="container">
+                    <h2>Punchcard</h2>
+                    <hr>
+                    <div class="container">
+                        <div class="well">
+                            <div id="graph-wrapper">
+                                <div id="graph"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+{% endblock %}
+{% block scripts %}
+    {% assets "metrics_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+{% endblock %}

@@ -1,4 +1,4 @@
-from gitnoc.services.settings import get_settings
+from .settings import get_settings
 from gitpandas import ProjectDirectory
 import json
 import os

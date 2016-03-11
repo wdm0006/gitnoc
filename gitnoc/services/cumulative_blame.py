@@ -1,8 +1,7 @@
 import os
 import json
-import threading
 from gitpandas import ProjectDirectory
-from gitnoc.services.settings import get_settings, get_file_prefix
+from .settings import get_settings, get_file_prefix
 
 __author__ = 'willmcginnis'
 

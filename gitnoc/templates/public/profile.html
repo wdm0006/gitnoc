@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'macros.html' import render_form %}
+{% from 'macros/macros.html' import render_form %}
 {% block content %}
     <br><br><br>
     <div class="row">
@@ -12,10 +12,10 @@
     </div>
     <h3>Select and Existing Profile</h3>
     <div class="your-form">
-        {{ render_form(select_form, action_url='/profile', action_text='Select') }}
+        {{ render_form(select_form, action_url='#', action_text='Select') }}
     </div>
     <h3>Create a New Profile</h3>
     <div class="your-form">
-        {{ render_form(create_form, action_url='/profile', action_text='Create') }}
+        {{ render_form(create_form, action_url='#', action_text='Create') }}
     </div>
 {% endblock content %}

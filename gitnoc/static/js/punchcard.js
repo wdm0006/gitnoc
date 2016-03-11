@@ -1,5 +1,4 @@
 // modified version of: http://gabekoss.com/blog/2014/06/creating_github_style_punchcard_graph_with_d3/
-
 var fullWidth = document.getElementById('graph').offsetWidth;
 var graphPadding = 120;
 var width = (fullWidth-graphPadding);
@@ -28,13 +27,13 @@ $(document).ready(function(){
     x = {
       min:  0,
       max:  width
-    }
+    };
     x.step = x.max/24;
 
     y = {
       min:  0,
       max:  height
-    }
+    };
     y.step = y.max/7;
 
   var dayText = dayGroup.selectAll("text")
@@ -70,11 +69,11 @@ $(document).ready(function(){
 
   z = {
     data: scaleData
-  }
-  z.max    = d3.max(z.data)
-  z.min    = d3.min(z.data)
-  z.domain = [z.min, z.max]
-  z.range  = [4, 15]
+  };
+  z.max    = d3.max(z.data);
+  z.min    = d3.min(z.data);
+  z.domain = [z.min, z.max];
+  z.range  = [4, 15];
   z.scale  = d3.scale.linear().
   domain(z.domain).
   range(z.range);

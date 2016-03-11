@@ -1,3 +1,4 @@
+from gitpandas import ProjectDirectory
 import json
 import os
 
@@ -77,6 +78,26 @@ def update_profile(project_dir, extensions, ignore_dir):
             config['project_dir'] = project_dir
             config['extensions'] = extensions
             config['ignore_dir'] = ignore_dir
+        out.append(config)
+    json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
+    return True
+
+
+def setup_repos_object():
+    settings = get_settings()
+    project_dir = settings.get('project_dir', os.getcwd())
+    extensions = settings.get('extensions', None)
+    ignore_dir = settings.get('ignore_dir', None)
+    repo = ProjectDirectory(working_dir=project_dir)
+
+
+def ignore_file(file_name):
+    bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
+    out = []
+    for config in configs:
+        if config.get('current_profile', False):
+            config['ignore_dir'].append(file_name.replace('-', '/'))
         out.append(config)
     json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
     return True
