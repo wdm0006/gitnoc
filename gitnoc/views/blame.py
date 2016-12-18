@@ -35,7 +35,7 @@ def cumulative_author_blame_data():
 
 @blueprint.route('/cumulative_author_blame', methods=['GET'])
 def cumulative_author_blame():
-    q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json', timeout=6000)
+    q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json', timeout=60000)
     return redirect(url_for('blame.blame'))
 
 
@@ -50,5 +50,5 @@ def cumulative_project_blame_data():
 
 @blueprint.route('/cumulative_project_blame', methods=['GET'])
 def cumulative_project_blame():
-    q.enqueue(cumulative_blame, 'project', 'cumulative_project_blame.json', timeout=6000)
+    q.enqueue(cumulative_blame, 'project', 'cumulative_project_blame.json', timeout=60000)
     return redirect(url_for('blame.blame'))

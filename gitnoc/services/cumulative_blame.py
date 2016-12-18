@@ -16,7 +16,7 @@ def cumulative_blame(by, file_stub):
     print(extensions)
     print(ignore_dir)
     print(by)
-    cb = repo.cumulative_blame(branch='master', extensions=extensions, ignore_dir=ignore_dir, by=by, num_datapoints=100, skip=None, limit=None)
+    cb = repo.cumulative_blame(branch='master', extensions=extensions, ignore_dir=ignore_dir, by=by, skip=3, limit=100)
     cb = cb[~cb.index.duplicated()]
     t = json.loads(cb.to_json(orient='columns'))
 
