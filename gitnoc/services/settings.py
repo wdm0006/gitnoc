@@ -89,6 +89,7 @@ def setup_repos_object():
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
     repo = ProjectDirectory(working_dir=project_dir)
+    return repo
 
 
 def ignore_file(file_name):

@@ -11,8 +11,9 @@ def get_file_change_rates():
     project_dir = settings.get('project_dir', os.getcwd())
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
+
     repo = ProjectDirectory(working_dir=project_dir)
-    cb = repo.file_change_rates(extensions=extensions, ignore_dir=ignore_dir, coverage=True, days=7)
+    cb = repo.file_change_rates(ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], coverage=True, days=7)
     cb.reset_index(level=0, inplace=True)
     data = json.loads(cb.to_json(orient='records'))
 

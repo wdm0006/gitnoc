@@ -25,7 +25,12 @@ def metrics():
 
 @blueprint.route('/punchcard_data', methods=['GET'])
 def punchchard_data():
-    output = get_punchcard()
+    settings = get_settings()
+    project_dir = settings.get('project_dir', os.getcwd())
+    extensions = settings.get('extensions', None)
+    ignore_dir = settings.get('ignore_dir', None)
+
+    output = get_punchcard(project_dir, extensions, ignore_dir)
     return str(output)
 
 

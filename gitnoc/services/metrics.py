@@ -2,17 +2,21 @@ from .settings import get_settings
 from gitpandas import ProjectDirectory
 import numpy as np
 import os
+from gitnoc.app import cache
+
 
 __author__ = 'willmcginnis'
 
 
+@cache.cached(timeout=600, key_prefix='metrics_leaderboard_')
 def week_leader_board(n=5):
     settings = get_settings()
     project_dir = settings.get('project_dir', os.getcwd())
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
+
     repo = ProjectDirectory(working_dir=project_dir)
-    ch = repo.commit_history(branch='master', extensions=extensions, ignore_dir=ignore_dir, limit=None, days=21)
+    ch = repo.commit_history(branch='master', ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], limit=None, days=21)
 
     metric = 'net'
     print(ch)
@@ -35,7 +39,7 @@ def week_leader_board(n=5):
     if extensions is not None:
         ext_ranks = []
         for ext in extensions:
-            ch = repo.commit_history(branch='master', extensions=[ext], ignore_dir=ignore_dir, days=21)
+            ch = repo.commit_history(branch='master', ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], days=21)
             ext_ranks.append((ch[metric].sum(), ext))
         ext_ranks = sorted(ext_ranks, key=lambda x: x[0], reverse=True)[:n]
         leader_board['top_extensions'] = [{'label': x[1], 'net': int(x[0]), 'rank': idx + 1} for idx, x in enumerate(ext_ranks)]
@@ -43,15 +47,14 @@ def week_leader_board(n=5):
     return leader_board
 
 
-def get_punchcard():
-    settings = get_settings()
-    project_dir = settings.get('project_dir', os.getcwd())
-    extensions = settings.get('extensions', None)
-    ignore_dir = settings.get('ignore_dir', None)
+@cache.cached(timeout=600, key_prefix='metrics_punchcard_')
+def get_punchcard(project_dir, extensions, ignore_dir):
     repo = ProjectDirectory(working_dir=project_dir)
-
-    pc = repo.punchcard(branch='master', extensions=extensions, ignore_dir=ignore_dir)
-
+    pc = repo.punchcard(
+        branch='master',
+        ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir],
+        include_globs=['*.%s' % (x, ) for x in extensions]
+    )
     data_set = []
     for idx in range(pc.shape[0]):
         data_set.append([pc.loc[idx, 'day_of_week'], pc.loc[idx, 'hour_of_day'], pc.loc[idx, 'net']])
@@ -59,11 +62,13 @@ def get_punchcard():
     return data_set
 
 
+@cache.cached(timeout=600, key_prefix='metrics_repo_details_')
 def get_repo_details(repo_name):
     settings = get_settings()
     project_dir = settings.get('project_dir', os.getcwd())
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
+
     repos = ProjectDirectory(working_dir=project_dir)
     out = []
     for repo in repos.repos:
@@ -81,12 +86,16 @@ def get_repo_details(repo_name):
                     'last_edit': df.loc[idx, 'last_edit_date'].strftime('%H:%M %d-%m-%Y'),
                     'clean_file_name': df.loc[idx, 'file'].replace('/', '-')
                 })
+
     return out
 
 
+@cache.cached(timeout=600, key_prefix='metrics_repo_names_')
 def get_repo_names():
     settings = get_settings()
     project_dir = settings.get('project_dir', os.getcwd())
+
     repos = ProjectDirectory(working_dir=project_dir)
     repo_names = [str(x._repo_name()) for x in repos.repos]
+
     return repo_names

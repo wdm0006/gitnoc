@@ -1,0 +1,21 @@
+name: gitnoc
+dependencies:
+- pip=8.1.2=py35_0
+- python=3.5.2=2
+- setuptools=25.1.6=py35_0
+- wheel=0.29.0=py35_0
+- pip:
+   - Flask
+   - git+https://github.com/wdm0006/git-pandas.git
+   - Flask-WTF==0.11
+   - WTForms==2.0.2
+   - wtforms-components
+   - Redis >= 2.6.0
+   - rq
+   - Flask-Cache
+   - pandas>=0.17.0
+   - Flask-Script
+   - Flask-Assets==0.10
+   - cssmin>=0.2.0
+   - jsmin>=2.0.11
+   - requests

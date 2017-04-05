@@ -3,13 +3,15 @@ GitNOC
 
 ![Metrics Example](https://raw.githubusercontent.com/wdm0006/gitnoc/master/img/metrics_example.png)
 
-A simple dashboard with Git statistics for teams and organizations. Currently in development, but operational. Is heavily
+A simple dashboard with Git statistics for teams and organizations. 
+Currently in development, but somewhat operational. Is heavily
 based on git-pandas.  The general architecture is:
 
  * Flask for the app itself
  * nvd3 for visualizations and stuff
  * datatables for tables
  * rq and redis for background tasks
+ * Docker and docker-compose
  
 The aim is to have a simple UI that can run on local host and visualize the interesting project-level analytics made possible
 by git-pandas. Current functionality is:
@@ -39,28 +41,21 @@ TODO:
 
  * When no data is found for graphs, put something telling the user that on screen
  * When new data is being computed, put something telling the user that on screen
+ * 
  
-How to Install
-==============
+How to Use
+==========
 
-For the python component: set up a virtualenv then:
+Docker compose is used to orchestrate the workers, redis and the flask
+app.  Assuming you have a docker-machine called default running, you can
+run the whole app with:
 
-    $pip install -r requirements.txt
+    docker-compose up
+    open http://$(docker-machine ip default):5050
 
-For the web components:
-
-    $brew install node
-    $npm install -g bower
-    $bower install
-
-For long tasks, we use redis and rq, so be sure to have a redis server up:
-
-    $brew install redis
-    $nohup redis-server &
-   
-Finally, to run, make sure you also have an rqworker running from this directory:
-
-    $rqworker
+This won't have access to the local file system, so will only work with
+remote git repos. Future work is around making that process nicer, with
+things like rsa-key integration and the like.
 
 Screenshots
 ===========

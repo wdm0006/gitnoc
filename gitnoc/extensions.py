@@ -7,13 +7,9 @@
 
 """
 
-from redis import Redis
-from rq import Queue
 from flask_cache import Cache
 
 
 __author__ = 'willmcginnis'
 
-q = Queue(connection=Redis())
-
-cache = Cache(config={'CACHE_TYPE': 'simple'})
+cache = Cache()

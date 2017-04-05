@@ -1,5 +1,5 @@
 Flask
-git-pandas==1.0.2
+git+https://github.com/wdm0006/git-pandas.git
 Flask-WTF==0.11
 WTForms==2.0.2
 wtforms-components
@@ -12,3 +12,4 @@ Flask-Script
 Flask-Assets==0.10
 cssmin>=0.2.0
 jsmin>=2.0.11
+requests

@@ -7,12 +7,9 @@
 
 """
 
-import json
-import os
 from flask import Blueprint, redirect, url_for
 from gitnoc.services.cumulative_blame import *
 from gitnoc.utils import render_wrapper
-from gitnoc.extensions import q
 
 __author__ = 'willmcginnis'
 
@@ -35,7 +32,12 @@ def cumulative_author_blame_data():
 
 @blueprint.route('/cumulative_author_blame', methods=['GET'])
 def cumulative_author_blame():
-    q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json', timeout=60000)
+    from gitnoc.app import q
+    if q is not None:
+        q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json', timeout=60000)
+    else:
+        cumulative_blame('committer', 'cumulative_author_blame.json')
+
     return redirect(url_for('blame.blame'))
 
 
@@ -50,5 +52,10 @@ def cumulative_project_blame_data():
 
 @blueprint.route('/cumulative_project_blame', methods=['GET'])
 def cumulative_project_blame():
-    q.enqueue(cumulative_blame, 'project', 'cumulative_project_blame.json', timeout=60000)
+    from gitnoc.app import q
+    if q is not None:
+        q.enqueue(cumulative_blame, 'project', 'cumulative_project_blame.json', timeout=60000)
+    else:
+        cumulative_blame('project', 'cumulative_project_blame.json')
+
     return redirect(url_for('blame.blame'))
