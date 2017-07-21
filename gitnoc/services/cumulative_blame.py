@@ -1,5 +1,6 @@
 import os
 import json
+from gitnoc.app import gp_cache
 from gitpandas import ProjectDirectory
 from .settings import get_settings, get_file_prefix
 
@@ -12,7 +13,7 @@ def cumulative_blame(by, file_stub):
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
 
-    repo = ProjectDirectory(working_dir=project_dir)
+    repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     print(extensions)
     print(ignore_dir)
     print(by)

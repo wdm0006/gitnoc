@@ -2,7 +2,7 @@ from .settings import get_settings
 from gitpandas import ProjectDirectory
 import numpy as np
 import os
-from gitnoc.app import cache
+from gitnoc.app import cache, gp_cache
 
 
 __author__ = 'willmcginnis'
@@ -15,7 +15,7 @@ def week_leader_board(n=5):
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
 
-    repo = ProjectDirectory(working_dir=project_dir)
+    repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     ch = repo.commit_history(branch='master', ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], limit=None, days=21)
 
     metric = 'net'
@@ -49,7 +49,7 @@ def week_leader_board(n=5):
 
 @cache.cached(timeout=600, key_prefix='metrics_punchcard_')
 def get_punchcard(project_dir, extensions, ignore_dir):
-    repo = ProjectDirectory(working_dir=project_dir)
+    repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     pc = repo.punchcard(
         branch='master',
         ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir],
@@ -69,7 +69,7 @@ def get_repo_details(repo_name):
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
 
-    repos = ProjectDirectory(working_dir=project_dir)
+    repos = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     out = []
     for repo in repos.repos:
         if repo._repo_name() == repo_name:
@@ -95,7 +95,7 @@ def get_repo_names():
     settings = get_settings()
     project_dir = settings.get('project_dir', os.getcwd())
 
-    repos = ProjectDirectory(working_dir=project_dir)
+    repos = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     repo_names = [str(x._repo_name()) for x in repos.repos]
 
     return repo_names

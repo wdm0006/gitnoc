@@ -1,5 +1,6 @@
 from gitpandas import ProjectDirectory
 import json
+from gitnoc.app import gp_cache
 import os
 
 __author__ = 'willmcginnis'
@@ -88,7 +89,7 @@ def setup_repos_object():
     project_dir = settings.get('project_dir', os.getcwd())
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
-    repo = ProjectDirectory(working_dir=project_dir)
+    repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     return repo
 
 

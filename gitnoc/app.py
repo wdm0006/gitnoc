@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template
 from gitnoc.extensions import (
+    gp_cache,
     cache
 )
 from redis import Redis
