@@ -37,7 +37,7 @@ def settings():
         pdv = ''
 
     if extensions is not None:
-        if isinstance(project_dir, list):
+        if isinstance(extensions, list):
             ext = ','.join(extensions)
         else:
             ext = extensions
@@ -45,7 +45,7 @@ def settings():
         ext = ''
 
     if ignore_dir is not None:
-        if isinstance(project_dir, list):
+        if isinstance(ignore_dir, list):
             ign = ','.join(ignore_dir)
         else:
             ign = ignore_dir
