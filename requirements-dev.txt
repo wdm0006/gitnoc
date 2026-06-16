@@ -1,0 +1,5 @@
+# Development / test dependencies.
+# The settings-service test suite is intentionally decoupled from the runtime
+# stack (Flask, redis, git-pandas) via stubs in tests/conftest.py, so pytest is
+# all that's needed to run it.
+pytest>=7.0
