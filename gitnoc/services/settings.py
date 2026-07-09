@@ -6,16 +6,48 @@ import os
 __author__ = 'willmcginnis'
 
 
+def default_settings():
+    """Safe defaults so the app degrades gracefully when no profile is configured.
+
+    Used when ``settings.json`` is missing/unreadable or no profile is marked
+    current. Returning these keys (rather than ``{}``) keeps ``render_wrapper``
+    and the service modules from crashing on a fresh install.
+    """
+    return {
+        'profile_name': 'default',
+        'project_dir': os.getcwd(),
+        'extensions': [],
+        'ignore_dir': [],
+    }
+
+
+def normalize_settings(config):
+    """Fill missing keys and coerce ``None`` extensions/ignore_dir to ``[]``.
+
+    New profiles are seeded with ``None`` for these fields (see
+    ``create_profile``), which breaks the glob comprehensions in the service
+    modules. Normalizing here means callers never receive ``None``.
+    """
+    settings = default_settings()
+    settings.update({k: v for k, v in config.items() if v is not None})
+    if not settings.get('project_dir'):
+        settings['project_dir'] = os.getcwd()
+    for key in ('extensions', 'ignore_dir'):
+        if settings.get(key) is None:
+            settings[key] = []
+    return settings
+
+
 def get_settings():
     try:
         bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
         for config in configs:
             if config.get('current_profile', False):
-                return config
-        return {}
+                return normalize_settings(config)
+        return default_settings()
     except:
-        return {}
+        return default_settings()
 
 
 def get_profiles():
