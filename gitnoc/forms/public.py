@@ -23,6 +23,7 @@ class SettingsForm(Form):
     project_directory = StringField('Project Directory (absolute path)', validators=[DataRequired()])
     extensions = StringField('Extensions to Report On')
     ignore_dir = StringField('Directories to Ignore')
+    branch = StringField('Branch to Analyze')
 
     def __init__(self, *args, **kwargs):
         super(SettingsForm, self).__init__(*args, **kwargs)
@@ -46,5 +47,7 @@ class SettingsForm(Form):
             self.ignore_dir.data = [str(x).strip() for x in self.ignore_dir.data.split(',')]
             if self.ignore_dir.data == ['']:
                 self.ignore_dir.data = None
+
+        self.branch.data = (self.branch.data or '').strip() or 'master'
 
         return True

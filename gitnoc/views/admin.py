@@ -21,12 +21,13 @@ blueprint = Blueprint('admin', __name__, static_folder="../static")
 def settings():
     form = SettingsForm(request.form, csrf_enabled=False)
     if form.validate_on_submit():
-        settings_services.update_profile(form.project_directory.data, form.extensions.data, form.ignore_dir.data)
+        settings_services.update_profile(form.project_directory.data, form.extensions.data, form.ignore_dir.data, form.branch.data)
 
     settings = settings_services.get_settings()
     extensions = settings.get('extensions', None)
     project_dir = settings.get('project_dir', None)
     ignore_dir = settings.get('ignore_dir', None)
+    branch = settings.get('branch', 'master')
 
     if project_dir is not None:
         if isinstance(project_dir, list):
@@ -52,7 +53,7 @@ def settings():
     else:
         ign = ''
 
-    return render_wrapper('public/settings.html', form=form, project_directory_values=pdv, ignore_dir_values=ign, extensions_values=ext)
+    return render_wrapper('public/settings.html', form=form, project_directory_values=pdv, ignore_dir_values=ign, extensions_values=ext, branch_value=branch or 'master')
 
 
 @blueprint.route('/profile', methods=["GET", "POST"])

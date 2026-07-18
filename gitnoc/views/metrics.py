@@ -29,8 +29,9 @@ def punchchard_data():
     project_dir = settings.get('project_dir', os.getcwd())
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
+    branch = settings.get('branch', 'master')
 
-    output = get_punchcard(project_dir, extensions, ignore_dir)
+    output = get_punchcard(project_dir, extensions, ignore_dir, branch)
     return str(output)
 
 

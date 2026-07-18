@@ -6,16 +6,16 @@ temporary ``settings.json`` so the repo's real config is never read or written.
 """
 
 
-def test_get_settings_missing_file_returns_empty_default(settings_env):
-    # No settings.json on disk at all -> safe empty default, not an exception.
+def test_get_settings_missing_file_returns_default_profile(settings_env):
+    # No settings.json on disk at all -> synthetic default, not an exception.
     assert not settings_env.path.exists()
-    assert settings_env.module.get_settings() == {}
+    assert settings_env.module.get_settings() == settings_env.module.default_settings()
 
 
-def test_get_settings_empty_file_returns_empty_default(settings_env):
-    # An empty/malformed file is swallowed and yields the empty default.
+def test_get_settings_empty_file_returns_default_profile(settings_env):
+    # An empty/malformed file is swallowed and yields the synthetic default.
     settings_env.path.write_text("")
-    assert settings_env.module.get_settings() == {}
+    assert settings_env.module.get_settings() == settings_env.module.default_settings()
 
 
 def test_get_settings_returns_current_profile(settings_env):
@@ -26,9 +26,9 @@ def test_get_settings_returns_current_profile(settings_env):
     assert settings_env.module.get_settings()["profile_name"] == "b"
 
 
-def test_get_settings_no_current_profile_returns_empty(settings_env):
+def test_get_settings_no_current_profile_returns_default(settings_env):
     settings_env.write([{"profile_name": "a", "current_profile": False}])
-    assert settings_env.module.get_settings() == {}
+    assert settings_env.module.get_settings() == settings_env.module.default_settings()
 
 
 def test_create_profile_appends(settings_env):
@@ -45,6 +45,8 @@ def test_create_profile_appends(settings_env):
         assert c["extensions"] is None
         assert c["ignore_dir"] is None
         assert c["project_dir"] is None
+        # A backward-compatible default branch is persisted on creation.
+        assert c["branch"] == "master"
 
 
 def test_change_profile_sets_exactly_one_current(settings_env):
@@ -123,3 +125,47 @@ def test_ignore_file_appends_to_current_profile(settings_env):
     # Dashes in the encoded path are turned back into path separators.
     assert by_name["b"]["ignore_dir"] == ["src/vendor/lib"]
     assert by_name["a"]["ignore_dir"] == []
+
+
+# --- branch selection -------------------------------------------------------
+
+def test_get_settings_missing_branch_normalizes_to_master(settings_env):
+    # Profiles created before the branch field existed have no branch key.
+    settings_env.write([{"profile_name": "legacy", "current_profile": True}])
+    assert settings_env.module.get_settings()["branch"] == "master"
+
+
+def test_get_settings_blank_branch_normalizes_to_master(settings_env):
+    settings_env.write([{"profile_name": "a", "current_profile": True, "branch": ""}])
+    assert settings_env.module.get_settings()["branch"] == "master"
+
+
+def test_get_settings_returns_configured_branch(settings_env):
+    settings_env.write([{"profile_name": "a", "current_profile": True, "branch": "main"}])
+    assert settings_env.module.get_settings()["branch"] == "main"
+
+
+def test_update_profile_persists_branch(settings_env):
+    settings_env.write([
+        {"profile_name": "b", "current_profile": True,
+         "project_dir": None, "extensions": None, "ignore_dir": None, "branch": "master"},
+    ])
+
+    assert settings_env.module.update_profile(
+        project_dir="/tmp/code", extensions=["py"], ignore_dir=["vendor"], branch="main"
+    ) is True
+
+    assert settings_env.read()[0]["branch"] == "main"
+
+
+def test_update_profile_blank_branch_defaults_to_master(settings_env):
+    settings_env.write([
+        {"profile_name": "b", "current_profile": True,
+         "project_dir": None, "extensions": None, "ignore_dir": None, "branch": "main"},
+    ])
+
+    settings_env.module.update_profile(
+        project_dir="/tmp/code", extensions=None, ignore_dir=None, branch=""
+    )
+
+    assert settings_env.read()[0]["branch"] == "master"
