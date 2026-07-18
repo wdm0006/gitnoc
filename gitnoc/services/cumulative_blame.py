@@ -12,12 +12,10 @@ def cumulative_blame(by, file_stub):
     project_dir = settings.get('project_dir', os.getcwd())
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
+    branch = settings.get('branch', 'master')
 
     repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
-    print(extensions)
-    print(ignore_dir)
-    print(by)
-    cb = repo.cumulative_blame(branch='master', ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], by=by, skip=3, limit=300)
+    cb = repo.cumulative_blame(branch=branch, ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], by=by, skip=3, limit=300)
     cb = cb[~cb.index.duplicated()]
     t = json.loads(cb.to_json(orient='columns'))
 

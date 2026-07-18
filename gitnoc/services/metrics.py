@@ -14,12 +14,12 @@ def week_leader_board(n=5):
     project_dir = settings.get('project_dir', os.getcwd())
     extensions = settings.get('extensions', None)
     ignore_dir = settings.get('ignore_dir', None)
+    branch = settings.get('branch', 'master')
 
     repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
-    ch = repo.commit_history(branch='master', ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], limit=None, days=21)
+    ch = repo.commit_history(branch=branch, ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], limit=None, days=21)
 
     metric = 'net'
-    print(ch)
     leader_board = {
         'top_committers': [],
         'top_repositories': [],
@@ -39,7 +39,7 @@ def week_leader_board(n=5):
     if extensions is not None:
         ext_ranks = []
         for ext in extensions:
-            ch = repo.commit_history(branch='master', ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], days=21)
+            ch = repo.commit_history(branch=branch, ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], days=21)
             ext_ranks.append((ch[metric].sum(), ext))
         ext_ranks = sorted(ext_ranks, key=lambda x: x[0], reverse=True)[:n]
         leader_board['top_extensions'] = [{'label': x[1], 'net': int(x[0]), 'rank': idx + 1} for idx, x in enumerate(ext_ranks)]
@@ -48,10 +48,10 @@ def week_leader_board(n=5):
 
 
 @cache.cached(timeout=600, key_prefix='metrics_punchcard_')
-def get_punchcard(project_dir, extensions, ignore_dir):
+def get_punchcard(project_dir, extensions, ignore_dir, branch='master'):
     repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     pc = repo.punchcard(
-        branch='master',
+        branch=branch,
         ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir],
         include_globs=['*.%s' % (x, ) for x in extensions]
     )

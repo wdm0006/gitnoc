@@ -18,6 +18,7 @@ def default_settings():
         'project_dir': os.getcwd(),
         'extensions': [],
         'ignore_dir': [],
+        'branch': 'master',
     }
 
 
@@ -35,6 +36,10 @@ def normalize_settings(config):
     for key in ('extensions', 'ignore_dir'):
         if settings.get(key) is None:
             settings[key] = []
+    # Profiles created before the branch field existed (or with a blank value)
+    # fall back to master so existing configuration keeps working.
+    if not settings.get('branch'):
+        settings['branch'] = 'master'
     return settings
 
 
@@ -82,7 +87,8 @@ def create_profile(profile_name):
         "current_profile": False,
         "extensions": None,
         "ignore_dir": None,
-        "project_dir": None
+        "project_dir": None,
+        "branch": "master"
     })
     json.dump(configs, open(bp + os.sep + 'settings.json', 'w'), indent=4)
     return True
@@ -102,7 +108,7 @@ def change_profile(profile_name):
     return True
 
 
-def update_profile(project_dir, extensions, ignore_dir):
+def update_profile(project_dir, extensions, ignore_dir, branch='master'):
     bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
     out = []
@@ -111,6 +117,7 @@ def update_profile(project_dir, extensions, ignore_dir):
             config['project_dir'] = project_dir
             config['extensions'] = extensions
             config['ignore_dir'] = ignore_dir
+            config['branch'] = branch or 'master'
         out.append(config)
     json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
     return True

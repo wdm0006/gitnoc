@@ -12,16 +12,35 @@ import types
 
 import pytest
 
-# --- Stub the heavy/optional imports pulled in by the settings module --------
+# --- Stub the heavy/optional imports pulled in by the service modules --------
+# CI installs only pytest, so gitpandas / flask-cache / numpy are never present.
+# Stubbing them here lets the pure service logic import and run under pytest.
 if "gitpandas" not in sys.modules:
     _gitpandas_stub = types.ModuleType("gitpandas")
-    _gitpandas_stub.ProjectDirectory = object  # only referenced, never called here
+    _gitpandas_stub.ProjectDirectory = object  # tests monkeypatch the per-module binding
     sys.modules["gitpandas"] = _gitpandas_stub
+
+
+class _DummyCache:
+    """Stand-in for the flask-cache instance; ``cached`` is a no-op decorator."""
+
+    def cached(self, *args, **kwargs):
+        def decorator(fn):
+            return fn
+
+        return decorator
+
 
 if "gitnoc.app" not in sys.modules:
     _app_stub = types.ModuleType("gitnoc.app")
     _app_stub.gp_cache = None
+    _app_stub.cache = _DummyCache()
     sys.modules["gitnoc.app"] = _app_stub
+
+if "numpy" not in sys.modules:
+    _numpy_stub = types.ModuleType("numpy")
+    _numpy_stub.sum = sum  # only used as the aggregator passed to DataFrame.agg
+    sys.modules["numpy"] = _numpy_stub
 
 # Import after stubbing so the real Flask/redis/git-pandas stack is never loaded.
 from gitnoc.services import settings as settings_service  # noqa: E402
