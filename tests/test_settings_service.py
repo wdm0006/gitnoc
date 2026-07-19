@@ -5,17 +5,27 @@ These exercise the file-backed JSON profile logic in isolation.  The
 temporary ``settings.json`` so the repo's real config is never read or written.
 """
 
+import os
+
+
+def assert_safe_defaults(settings):
+    assert settings["profile_name"] == "default"
+    assert settings["project_dir"] == os.getcwd()
+    assert settings["extensions"] == []
+    assert settings["ignore_dir"] == []
+    assert settings["branch"] == "master"
+
 
 def test_get_settings_missing_file_returns_default_profile(settings_env):
     # No settings.json on disk at all -> synthetic default, not an exception.
     assert not settings_env.path.exists()
-    assert settings_env.module.get_settings() == settings_env.module.default_settings()
+    assert_safe_defaults(settings_env.module.get_settings())
 
 
 def test_get_settings_empty_file_returns_default_profile(settings_env):
     # An empty/malformed file is swallowed and yields the synthetic default.
     settings_env.path.write_text("")
-    assert settings_env.module.get_settings() == settings_env.module.default_settings()
+    assert_safe_defaults(settings_env.module.get_settings())
 
 
 def test_get_settings_returns_current_profile(settings_env):
@@ -28,7 +38,7 @@ def test_get_settings_returns_current_profile(settings_env):
 
 def test_get_settings_no_current_profile_returns_default(settings_env):
     settings_env.write([{"profile_name": "a", "current_profile": False}])
-    assert settings_env.module.get_settings() == settings_env.module.default_settings()
+    assert_safe_defaults(settings_env.module.get_settings())
 
 
 def test_create_profile_appends(settings_env):
