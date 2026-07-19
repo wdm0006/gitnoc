@@ -39,7 +39,7 @@ def week_leader_board(n=5):
     if extensions is not None:
         ext_ranks = []
         for ext in extensions:
-            ch = repo.commit_history(branch=branch, ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], days=21)
+            ch = repo.commit_history(branch=branch, ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (ext, )], days=21)
             ext_ranks.append((ch[metric].sum(), ext))
         ext_ranks = sorted(ext_ranks, key=lambda x: x[0], reverse=True)[:n]
         leader_board['top_extensions'] = [{'label': x[1], 'net': int(x[0]), 'rank': idx + 1} for idx, x in enumerate(ext_ranks)]
