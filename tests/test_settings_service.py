@@ -7,6 +7,8 @@ temporary ``settings.json`` so the repo's real config is never read or written.
 
 import os
 
+import pytest
+
 
 def assert_safe_defaults(settings):
     assert settings["profile_name"] == "default"
@@ -22,10 +24,29 @@ def test_get_settings_missing_file_returns_default_profile(settings_env):
     assert_safe_defaults(settings_env.module.get_settings())
 
 
-def test_get_settings_empty_file_returns_default_profile(settings_env):
-    # An empty/malformed file is swallowed and yields the synthetic default.
+@pytest.mark.parametrize("getter_name", [
+    "get_settings",
+    "get_profiles",
+    "get_file_prefix",
+])
+def test_malformed_file_raises_parse_error(settings_env, getter_name):
     settings_env.path.write_text("")
-    assert_safe_defaults(settings_env.module.get_settings())
+    with pytest.raises(ValueError):
+        getattr(settings_env.module, getter_name)()
+
+
+@pytest.mark.parametrize("getter_name", [
+    "get_settings",
+    "get_profiles",
+    "get_file_prefix",
+])
+def test_file_read_errors_propagate(settings_env, monkeypatch, getter_name):
+    def unreadable_file(*args, **kwargs):
+        raise PermissionError("settings file is unreadable")
+
+    monkeypatch.setattr("builtins.open", unreadable_file)
+    with pytest.raises(PermissionError, match="unreadable"):
+        getattr(settings_env.module, getter_name)()
 
 
 def test_get_settings_returns_current_profile(settings_env):
