@@ -9,9 +9,9 @@ __author__ = 'willmcginnis'
 def default_settings():
     """Safe defaults so the app degrades gracefully when no profile is configured.
 
-    Used when ``settings.json`` is missing/unreadable or no profile is marked
-    current. Returning these keys (rather than ``{}``) keeps ``render_wrapper``
-    and the service modules from crashing on a fresh install.
+    Used when ``settings.json`` is missing or no profile is marked current.
+    Returning these keys (rather than ``{}``) keeps ``render_wrapper`` and the
+    service modules from crashing on a fresh install.
     """
     return {
         'profile_name': 'default',
@@ -43,40 +43,43 @@ def normalize_settings(config):
     return settings
 
 
-def get_settings():
+def _load_settings():
+    bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     try:
-        bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-        for config in configs:
-            if config.get('current_profile', False):
-                return normalize_settings(config)
+        with open(bp + os.sep + 'settings.json', 'r') as settings_file:
+            return json.load(settings_file)
+    except FileNotFoundError:
+        return None
+
+
+def get_settings():
+    configs = _load_settings()
+    if configs is None:
         return default_settings()
-    except:
-        return default_settings()
+    for config in configs:
+        if config.get('current_profile', False):
+            return normalize_settings(config)
+    return default_settings()
 
 
 def get_profiles():
-    try:
-        bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-        choices = []
-        for config in configs:
-            choices.append((config.get('profile_name', ''), config.get('profile_name', '')))
-        return choices
-    except:
+    configs = _load_settings()
+    if configs is None:
         return []
+    choices = []
+    for config in configs:
+        choices.append((config.get('profile_name', ''), config.get('profile_name', '')))
+    return choices
 
 
 def get_file_prefix():
-    try:
-        bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
-        for config in configs:
-            if config.get('current_profile', False):
-                return config.get('profile_name', '').replace(' ', '_') + '_'
+    configs = _load_settings()
+    if configs is None:
         return ''
-    except:
-        return ''
+    for config in configs:
+        if config.get('current_profile', False):
+            return config.get('profile_name', '').replace(' ', '_') + '_'
+    return ''
 
 
 def create_profile(profile_name):
