@@ -1,14 +1,15 @@
 from .settings import get_settings
+from .analytics_cache import cached_analytics
 from gitpandas import ProjectDirectory
 import numpy as np
 import os
-from gitnoc.app import cache, gp_cache
+from gitnoc.app import gp_cache
 
 
 __author__ = 'willmcginnis'
 
 
-@cache.cached(timeout=600, key_prefix='metrics_leaderboard_')
+@cached_analytics('metrics_leaderboard_', timeout=600)
 def week_leader_board(n=5):
     settings = get_settings()
     project_dir = settings.get('project_dir', os.getcwd())
@@ -47,7 +48,7 @@ def week_leader_board(n=5):
     return leader_board
 
 
-@cache.cached(timeout=600, key_prefix='metrics_punchcard_')
+@cached_analytics('metrics_punchcard_', timeout=600)
 def get_punchcard(project_dir, extensions, ignore_dir, branch='master'):
     repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     pc = repo.punchcard(
@@ -62,7 +63,7 @@ def get_punchcard(project_dir, extensions, ignore_dir, branch='master'):
     return data_set
 
 
-@cache.cached(timeout=600, key_prefix='metrics_repo_details_')
+@cached_analytics('metrics_repo_details_', timeout=600)
 def get_repo_details(repo_name):
     settings = get_settings()
     project_dir = settings.get('project_dir', os.getcwd())
@@ -90,7 +91,7 @@ def get_repo_details(repo_name):
     return out
 
 
-@cache.cached(timeout=600, key_prefix='metrics_repo_names_')
+@cached_analytics('metrics_repo_names_', timeout=600)
 def get_repo_names():
     settings = get_settings()
     project_dir = settings.get('project_dir', os.getcwd())
