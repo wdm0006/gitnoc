@@ -180,6 +180,175 @@ def test_ignore_file_appends_to_existing_list(settings_env):
     assert by_name["a"]["ignore_dir"] == []
 
 
+# --- fresh checkout (no settings.json) --------------------------------------
+
+def test_create_profile_on_fresh_checkout_creates_file(settings_env):
+    # A fresh checkout ships no settings.json; creating a profile must make one.
+    assert not settings_env.path.exists()
+
+    assert settings_env.module.create_profile("first") is True
+
+    configs = settings_env.read()
+    assert len(configs) == 1
+    assert configs[0]["profile_name"] == "first"
+    assert configs[0]["current_profile"] is False
+    assert configs[0]["project_dir"] is None
+    assert configs[0]["extensions"] == []
+    assert configs[0]["ignore_dir"] == []
+    assert configs[0]["branch"] == "master"
+
+
+def test_fresh_checkout_profile_round_trip(settings_env):
+    # The whole first-run journey: create -> select -> configure.
+    settings_env.module.create_profile("first")
+    settings_env.module.change_profile("first")
+    settings_env.module.update_profile(
+        project_dir="/tmp/code", extensions=["py"], ignore_dir=["vendor"], branch="main"
+    )
+
+    configs = settings_env.read()
+    assert len(configs) == 1
+    assert configs[0]["current_profile"] is True
+    assert configs[0]["project_dir"] == "/tmp/code"
+    assert configs[0]["extensions"] == ["py"]
+    assert configs[0]["ignore_dir"] == ["vendor"]
+    assert configs[0]["branch"] == "main"
+
+
+def test_change_profile_on_fresh_checkout_does_not_raise(settings_env):
+    assert settings_env.module.change_profile("nope") is True
+    assert settings_env.read() == []
+
+
+def test_update_profile_on_fresh_checkout_does_not_raise(settings_env):
+    assert settings_env.module.update_profile(
+        project_dir="/tmp/code", extensions=[], ignore_dir=[]
+    ) is True
+    assert settings_env.read() == []
+
+
+def test_ignore_file_on_fresh_checkout_is_a_no_op(settings_env):
+    assert settings_env.module.ignore_file("src-vendor-lib") is True
+    # No profile to ignore for, so no bogus settings file is left behind.
+    assert not settings_env.path.exists()
+
+
+def test_ignore_file_without_current_profile_leaves_file_untouched(settings_env):
+    settings_env.write([{"profile_name": "a", "current_profile": False, "ignore_dir": []}])
+    before = settings_env.path.read_bytes()
+
+    assert settings_env.module.ignore_file("src-vendor-lib") is True
+
+    assert settings_env.path.read_bytes() == before
+
+
+# --- writers preserve existing data -----------------------------------------
+
+def test_create_profile_preserves_existing_profiles(settings_env):
+    settings_env.write([
+        {"profile_name": "a", "current_profile": True, "project_dir": "/tmp/a",
+         "extensions": ["py"], "ignore_dir": ["vendor"], "branch": "main"},
+    ])
+
+    settings_env.module.create_profile("b")
+
+    configs = settings_env.read()
+    assert [c["profile_name"] for c in configs] == ["a", "b"]
+    assert configs[0]["current_profile"] is True
+    assert configs[0]["project_dir"] == "/tmp/a"
+    assert configs[0]["extensions"] == ["py"]
+    assert configs[0]["ignore_dir"] == ["vendor"]
+    assert configs[0]["branch"] == "main"
+
+
+def test_change_profile_preserves_existing_profile_values(settings_env):
+    settings_env.write([
+        {"profile_name": "a", "current_profile": True, "project_dir": "/tmp/a",
+         "extensions": ["py"], "ignore_dir": ["vendor"], "branch": "main"},
+        {"profile_name": "b", "current_profile": False, "project_dir": "/tmp/b",
+         "extensions": ["js"], "ignore_dir": ["node_modules"], "branch": "master"},
+    ])
+
+    settings_env.module.change_profile("b")
+
+    by_name = {c["profile_name"]: c for c in settings_env.read()}
+    assert by_name["a"]["project_dir"] == "/tmp/a"
+    assert by_name["a"]["extensions"] == ["py"]
+    assert by_name["a"]["ignore_dir"] == ["vendor"]
+    assert by_name["a"]["branch"] == "main"
+    assert by_name["b"]["project_dir"] == "/tmp/b"
+    assert by_name["b"]["extensions"] == ["js"]
+    assert by_name["b"]["branch"] == "master"
+
+
+def test_update_profile_preserves_other_profile_values(settings_env):
+    settings_env.write([
+        {"profile_name": "a", "current_profile": False, "project_dir": "/tmp/a",
+         "extensions": ["py"], "ignore_dir": ["vendor"], "branch": "main"},
+        {"profile_name": "b", "current_profile": True, "project_dir": None,
+         "extensions": None, "ignore_dir": None, "branch": "master"},
+    ])
+
+    settings_env.module.update_profile(
+        project_dir="/tmp/code", extensions=["js"], ignore_dir=["build"], branch="dev"
+    )
+
+    by_name = {c["profile_name"]: c for c in settings_env.read()}
+    assert by_name["a"] == {
+        "profile_name": "a", "current_profile": False, "project_dir": "/tmp/a",
+        "extensions": ["py"], "ignore_dir": ["vendor"], "branch": "main",
+    }
+    assert by_name["b"]["project_dir"] == "/tmp/code"
+    assert by_name["b"]["branch"] == "dev"
+
+
+def test_ignore_file_preserves_other_profile_values(settings_env):
+    settings_env.write([
+        {"profile_name": "a", "current_profile": False, "project_dir": "/tmp/a",
+         "extensions": ["py"], "ignore_dir": ["vendor"], "branch": "main"},
+        {"profile_name": "b", "current_profile": True, "project_dir": "/tmp/b",
+         "extensions": ["js"], "ignore_dir": ["build"], "branch": "dev"},
+    ])
+
+    settings_env.module.ignore_file("src-vendor-lib")
+
+    by_name = {c["profile_name"]: c for c in settings_env.read()}
+    assert by_name["a"]["ignore_dir"] == ["vendor"]
+    assert by_name["a"]["project_dir"] == "/tmp/a"
+    assert by_name["b"]["ignore_dir"] == ["build", "src/vendor/lib"]
+    assert by_name["b"]["project_dir"] == "/tmp/b"
+    assert by_name["b"]["extensions"] == ["js"]
+
+
+# --- atomic writes ----------------------------------------------------------
+
+def test_failed_write_leaves_previous_file_intact(settings_env):
+    settings_env.write([
+        {"profile_name": "a", "current_profile": True, "project_dir": "/tmp/a",
+         "extensions": ["py"], "ignore_dir": ["vendor"], "branch": "main"},
+    ])
+    before = settings_env.path.read_bytes()
+
+    # A set is not JSON-serializable, so json.dump raises partway through.
+    with pytest.raises(TypeError):
+        settings_env.module.update_profile(
+            project_dir="/tmp/code", extensions={"py"}, ignore_dir=[]
+        )
+
+    assert settings_env.path.read_bytes() == before
+
+
+def test_failed_write_leaves_no_temp_file_behind(settings_env):
+    settings_env.write([{"profile_name": "a", "current_profile": True}])
+
+    with pytest.raises(TypeError):
+        settings_env.module.update_profile(
+            project_dir="/tmp/code", extensions={"py"}, ignore_dir=[]
+        )
+
+    assert list(settings_env.path.parent.glob("settings.json.*")) == []
+
+
 # --- branch selection -------------------------------------------------------
 
 def test_get_settings_missing_branch_normalizes_to_master(settings_env):
