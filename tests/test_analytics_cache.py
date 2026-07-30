@@ -115,27 +115,52 @@ class _RowFrame:
         return self
 
 
+class _FileDetailFrame(_RowFrame):
+    """Single-level ``file`` index returned by git-pandas."""
+
+    def __init__(self, indexed_rows):
+        self.indexed_rows = indexed_rows
+        super().__init__([row for _, row in indexed_rows])
+
+    def reset_index(self, *args, **kwargs):
+        if args or set(kwargs) - {'inplace'}:
+            raise TypeError("single-level file index only supports plain reset_index()")
+        if not kwargs.get('inplace'):
+            return _RowFrame([
+                dict(row, file=file_name)
+                for file_name, row in self.indexed_rows
+            ])
+        return self
+
+
 class _Repo:
     def __init__(self, name):
         self.name = name
+        self.file_detail_calls = []
 
     def _repo_name(self):
         return self.name
 
-    def file_detail(self, extensions=None, ignore_dir=None):
-        return _RowFrame([{
-            'file': '%s.py' % self.name,
+    def file_detail(self, include_globs=None, ignore_globs=None, rev="HEAD", committer=True):
+        self.file_detail_calls.append({
+            'include_globs': include_globs,
+            'ignore_globs': ignore_globs,
+            'rev': rev,
+            'committer': committer,
+        })
+        return _FileDetailFrame([('%s.py' % self.name, {
             'loc': 10,
             'file_owner': self.name,
             'ext': 'py',
             'last_edit_date': datetime.datetime(2024, 1, 1, 12, 0),
-        }])
+        })])
 
 
 class FakeProjectDirectory:
     """Returns per-repository results so a key collision changes the output."""
 
     def __init__(self, working_dir=None, cache_backend=None):
+        FakeProjectDirectory.last_instance = self
         self.repos = [_Repo('api'), _Repo('web')]
 
     def commit_history(self, **kwargs):
@@ -235,6 +260,28 @@ def test_repo_details_are_not_served_from_another_repository(cache_env):
 
     assert [row['file_name'] for row in api] == ['api.py']
     assert [row['file_name'] for row in web] == ['web.py']
+
+
+def test_repo_details_use_git_pandas_file_detail_contract(cache_env):
+    details = metrics_service.get_repo_details('api')
+    repo = FakeProjectDirectory.last_instance.repos[0]
+
+    assert repo.file_detail_calls == [{
+        'include_globs': ['*.py'],
+        'ignore_globs': ['*/vendor/*'],
+        'rev': 'HEAD',
+        'committer': True,
+    }]
+    assert details == [{
+        'file_name': 'api.py',
+        'loc': 10,
+        'owner': 'api',
+        'extension': 'py',
+        'last_edit': '12:00 01-01-2024',
+        'clean_file_name': 'api.py',
+    }]
+    with pytest.raises(TypeError):
+        repo.file_detail(extensions=['py'])
 
 
 def test_repeated_calls_hit_the_same_entry(cache_env):
