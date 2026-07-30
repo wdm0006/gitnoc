@@ -1,5 +1,6 @@
 from .settings import get_settings
 from .analytics_cache import cached_analytics
+from .globs import ignore_globs, include_globs
 from gitpandas import ProjectDirectory
 import numpy as np
 import os
@@ -18,7 +19,7 @@ def week_leader_board(n=5):
     branch = settings.get('branch', 'master')
 
     repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
-    ch = repo.commit_history(branch=branch, ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], limit=None, days=21)
+    ch = repo.commit_history(branch=branch, ignore_globs=ignore_globs(ignore_dir), include_globs=include_globs(extensions), limit=None, days=21)
 
     metric = 'net'
     leader_board = {
@@ -40,7 +41,7 @@ def week_leader_board(n=5):
     if extensions is not None:
         ext_ranks = []
         for ext in extensions:
-            ch = repo.commit_history(branch=branch, ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (ext, )], days=21)
+            ch = repo.commit_history(branch=branch, ignore_globs=ignore_globs(ignore_dir), include_globs=include_globs([ext]), days=21)
             ext_ranks.append((ch[metric].sum(), ext))
         ext_ranks = sorted(ext_ranks, key=lambda x: x[0], reverse=True)[:n]
         leader_board['top_extensions'] = [{'label': x[1], 'net': int(x[0]), 'rank': idx + 1} for idx, x in enumerate(ext_ranks)]
@@ -53,8 +54,8 @@ def get_punchcard(project_dir, extensions, ignore_dir, branch='master'):
     repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
     pc = repo.punchcard(
         branch=branch,
-        ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir],
-        include_globs=['*.%s' % (x, ) for x in extensions]
+        ignore_globs=ignore_globs(ignore_dir),
+        include_globs=include_globs(extensions)
     )
     data_set = []
     for idx in range(pc.shape[0]):

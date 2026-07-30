@@ -3,6 +3,7 @@ import json
 from gitnoc.app import gp_cache
 from gitpandas import ProjectDirectory
 from .settings import get_settings, get_file_prefix
+from .globs import ignore_globs, include_globs
 
 __author__ = 'willmcginnis'
 
@@ -15,7 +16,7 @@ def cumulative_blame(by, file_stub):
     branch = settings.get('branch', 'master')
 
     repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
-    cb = repo.cumulative_blame(branch=branch, ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], by=by, skip=3, limit=300)
+    cb = repo.cumulative_blame(branch=branch, ignore_globs=ignore_globs(ignore_dir), include_globs=include_globs(extensions), by=by, skip=3, limit=300)
     cb = cb[~cb.index.duplicated()]
     t = json.loads(cb.to_json(orient='columns'))
 

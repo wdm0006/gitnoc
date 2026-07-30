@@ -1,4 +1,5 @@
 from .settings import get_settings
+from .globs import ignore_globs, include_globs
 from gitpandas import ProjectDirectory
 from gitnoc.app import gp_cache
 import json
@@ -14,7 +15,7 @@ def get_file_change_rates():
     ignore_dir = settings.get('ignore_dir', None)
 
     repo = ProjectDirectory(working_dir=project_dir, cache_backend=gp_cache)
-    cb = repo.file_change_rates(ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir], include_globs=['*.%s' % (x, ) for x in extensions], coverage=True, days=7)
+    cb = repo.file_change_rates(ignore_globs=ignore_globs(ignore_dir), include_globs=include_globs(extensions), coverage=True, days=7)
     cb.reset_index(level=0, inplace=True)
     data = json.loads(cb.to_json(orient='records'))
 
