@@ -25,9 +25,9 @@ def default_settings():
 def normalize_settings(config):
     """Fill missing keys and coerce ``None`` extensions/ignore_dir to ``[]``.
 
-    New profiles are seeded with ``None`` for these fields (see
-    ``create_profile``), which breaks the glob comprehensions in the service
-    modules. Normalizing here means callers never receive ``None``.
+    Legacy profiles may contain ``None`` for these fields, which breaks the
+    glob comprehensions in the service modules. Normalizing here means callers
+    never receive ``None``.
     """
     settings = default_settings()
     settings.update({k: v for k, v in config.items() if v is not None})
@@ -88,8 +88,8 @@ def create_profile(profile_name):
     configs.append({
         "profile_name": profile_name,
         "current_profile": False,
-        "extensions": None,
-        "ignore_dir": None,
+        "extensions": [],
+        "ignore_dir": [],
         "project_dir": None,
         "branch": "master"
     })
@@ -141,6 +141,7 @@ def ignore_file(file_name):
     out = []
     for config in configs:
         if config.get('current_profile', False):
+            config['ignore_dir'] = config.get('ignore_dir') or []
             config['ignore_dir'].append(file_name.replace('-', '/'))
         out.append(config)
     json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
