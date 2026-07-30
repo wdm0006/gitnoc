@@ -2,6 +2,7 @@ from gitpandas import ProjectDirectory
 import json
 from gitnoc.app import gp_cache
 import os
+import tempfile
 
 __author__ = 'willmcginnis'
 
@@ -43,13 +44,46 @@ def normalize_settings(config):
     return settings
 
 
-def _load_settings():
+def _settings_path():
     bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return bp + os.sep + 'settings.json'
+
+
+def _load_settings():
     try:
-        with open(bp + os.sep + 'settings.json', 'r') as settings_file:
+        with open(_settings_path(), 'r') as settings_file:
             return json.load(settings_file)
     except FileNotFoundError:
         return None
+
+
+def _load_settings_for_write():
+    """Profile list to mutate, treating a missing file as "no profiles yet".
+
+    Writers run before ``settings.json`` exists on a fresh checkout. Malformed
+    JSON still propagates, matching the read paths.
+    """
+    configs = _load_settings()
+    return [] if configs is None else configs
+
+
+def _write_settings(configs):
+    """Serialize to a sibling temp file, then atomically rename it into place.
+
+    Dumping straight into ``open(path, 'w')`` truncates before serialization
+    runs, so a failure mid-dump would leave an empty or half-written file --
+    which now breaks every page, since malformed JSON propagates.
+    """
+    path = _settings_path()
+    fd, tmp_path = tempfile.mkstemp(dir=os.path.dirname(path), prefix='settings.json.', suffix='.tmp')
+    try:
+        with os.fdopen(fd, 'w') as tmp_file:
+            json.dump(configs, tmp_file, indent=4)
+        os.replace(tmp_path, path)
+    except BaseException:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        raise
 
 
 def get_settings():
@@ -83,8 +117,7 @@ def get_file_prefix():
 
 
 def create_profile(profile_name):
-    bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
+    configs = _load_settings_for_write()
     configs.append({
         "profile_name": profile_name,
         "current_profile": False,
@@ -93,13 +126,12 @@ def create_profile(profile_name):
         "project_dir": None,
         "branch": "master"
     })
-    json.dump(configs, open(bp + os.sep + 'settings.json', 'w'), indent=4)
+    _write_settings(configs)
     return True
 
 
 def change_profile(profile_name):
-    bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
+    configs = _load_settings_for_write()
     out = []
     for config in configs:
         if config.get('current_profile', True):
@@ -107,13 +139,12 @@ def change_profile(profile_name):
         if config.get('profile_name', '') == profile_name:
             config['current_profile'] = True
         out.append(config)
-    json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
+    _write_settings(out)
     return True
 
 
 def update_profile(project_dir, extensions, ignore_dir, branch='master'):
-    bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
+    configs = _load_settings_for_write()
     out = []
     for config in configs:
         if config.get('current_profile', False):
@@ -122,7 +153,7 @@ def update_profile(project_dir, extensions, ignore_dir, branch='master'):
             config['ignore_dir'] = ignore_dir
             config['branch'] = branch or 'master'
         out.append(config)
-    json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
+    _write_settings(out)
     return True
 
 
@@ -136,13 +167,17 @@ def setup_repos_object():
 
 
 def ignore_file(file_name):
-    bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    configs = json.load(open(bp + os.sep + 'settings.json', 'r'))
+    configs = _load_settings_for_write()
     out = []
+    changed = False
     for config in configs:
         if config.get('current_profile', False):
             config['ignore_dir'] = config.get('ignore_dir') or []
             config['ignore_dir'].append(file_name.replace('-', '/'))
+            changed = True
         out.append(config)
-    json.dump(out, open(bp + os.sep + 'settings.json', 'w'), indent=4)
+    # With no profile to ignore the file for there is nothing to persist, so
+    # don't create a settings.json that holds no configuration.
+    if changed:
+        _write_settings(out)
     return True
