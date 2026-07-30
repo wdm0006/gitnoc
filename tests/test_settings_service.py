@@ -73,8 +73,8 @@ def test_create_profile_appends(settings_env):
     # New profiles are seeded with the documented defaults.
     for c in configs:
         assert c["current_profile"] is False
-        assert c["extensions"] is None
-        assert c["ignore_dir"] is None
+        assert c["extensions"] == []
+        assert c["ignore_dir"] == []
         assert c["project_dir"] is None
         # A backward-compatible default branch is persisted on creation.
         assert c["branch"] == "master"
@@ -144,17 +144,39 @@ def test_get_file_prefix_missing_file_returns_empty(settings_env):
     assert settings_env.module.get_file_prefix() == ""
 
 
-def test_ignore_file_appends_to_current_profile(settings_env):
+def test_ignore_file_works_for_newly_created_profile(settings_env):
+    settings_env.write([])
+
+    settings_env.module.create_profile("new")
+    settings_env.module.change_profile("new")
+    assert settings_env.module.ignore_file("src-vendor-lib") is True
+
+    assert settings_env.read()[0]["ignore_dir"] == ["src/vendor/lib"]
+
+
+@pytest.mark.parametrize("legacy_ignore_dir", [None, pytest.param("missing", id="missing")])
+def test_ignore_file_normalizes_legacy_ignore_dir(settings_env, legacy_ignore_dir):
+    profile = {"profile_name": "legacy", "current_profile": True}
+    if legacy_ignore_dir != "missing":
+        profile["ignore_dir"] = legacy_ignore_dir
+    settings_env.write([profile])
+
+    assert settings_env.module.ignore_file("src-vendor-lib") is True
+
+    assert settings_env.read()[0]["ignore_dir"] == ["src/vendor/lib"]
+
+
+def test_ignore_file_appends_to_existing_list(settings_env):
     settings_env.write([
         {"profile_name": "a", "current_profile": False, "ignore_dir": []},
-        {"profile_name": "b", "current_profile": True, "ignore_dir": []},
+        {"profile_name": "b", "current_profile": True, "ignore_dir": ["build"]},
     ])
 
     assert settings_env.module.ignore_file("src-vendor-lib") is True
 
     by_name = {c["profile_name"]: c for c in settings_env.read()}
     # Dashes in the encoded path are turned back into path separators.
-    assert by_name["b"]["ignore_dir"] == ["src/vendor/lib"]
+    assert by_name["b"]["ignore_dir"] == ["build", "src/vendor/lib"]
     assert by_name["a"]["ignore_dir"] == []
 
 
