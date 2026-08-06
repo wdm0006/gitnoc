@@ -1,5 +1,6 @@
 # Development / test dependencies.
-# The settings-service test suite is intentionally decoupled from the runtime
-# stack (Flask, redis, git-pandas) via stubs in tests/conftest.py, so pytest is
-# all that's needed to run it.
+# The service tests are intentionally decoupled from the runtime stack (redis,
+# git-pandas) via stubs in tests/conftest.py.  Flask is needed on top of pytest
+# because the route tests bind the real blueprint and exercise its responses.
 pytest>=7.0
+Flask

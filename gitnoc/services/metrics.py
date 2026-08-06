@@ -59,7 +59,12 @@ def get_punchcard(project_dir, extensions, ignore_dir, branch='master'):
     )
     data_set = []
     for idx in range(pc.shape[0]):
-        data_set.append([pc.loc[idx, 'day_of_week'], pc.loc[idx, 'hour_of_day'], pc.loc[idx, 'net']])
+        # pandas hands back numpy scalars; coerce so the result is JSON-serializable.
+        data_set.append([
+            int(pc.loc[idx, 'day_of_week']),
+            int(pc.loc[idx, 'hour_of_day']),
+            int(pc.loc[idx, 'net']),
+        ])
 
     return data_set
 
