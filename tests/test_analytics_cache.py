@@ -268,7 +268,7 @@ def test_repo_details_use_git_pandas_file_detail_contract(cache_env):
 
     assert repo.file_detail_calls == [{
         'include_globs': ['*.py'],
-        'ignore_globs': ['*/vendor/*'],
+        'ignore_globs': ['vendor/*', '*/vendor/*', 'vendor', '*/vendor'],
         'rev': 'HEAD',
         'committer': True,
     }]
