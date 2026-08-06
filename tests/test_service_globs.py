@@ -73,9 +73,17 @@ class FakeFrame:
 def make_recorder():
     calls = []
 
+    class FakeRepo:
+        def _repo_name(self):
+            return "api"
+
+        def file_detail(self, include_globs=None, ignore_globs=None, rev="HEAD", committer=True):
+            calls.append(("file_detail", {'include_globs': include_globs, 'ignore_globs': ignore_globs}))
+            return FakeFrame()
+
     class FakeProjectDirectory:
         def __init__(self, working_dir=None, cache_backend=None):
-            pass
+            self.repos = [FakeRepo()]
 
         def _record(self, name, kwargs):
             calls.append((name, kwargs))
@@ -107,7 +115,7 @@ def _redirect_blame_output(base_dir, monkeypatch):
     monkeypatch.setattr(cumulative_blame_service, "__file__", str(fake_file))
 
 
-# --- the four analytics services --------------------------------------------
+# --- the five analytics services --------------------------------------------
 
 def test_week_leader_board_passes_expanded_ignore_globs(settings_env, monkeypatch):
     settings_env.write([PROFILE])
@@ -152,3 +160,14 @@ def test_file_change_rates_passes_expanded_ignore_globs(settings_env, monkeypatc
 
     assert globs_for(calls, "file_change_rates", "ignore_globs") == [EXPECTED_IGNORE]
     assert globs_for(calls, "file_change_rates", "include_globs") == [['*.py']]
+
+
+def test_repo_details_passes_expanded_ignore_globs(settings_env, monkeypatch):
+    settings_env.write([PROFILE])
+    fake_pd, calls = make_recorder()
+    monkeypatch.setattr(metrics_service, "ProjectDirectory", fake_pd)
+
+    metrics_service.get_repo_details("api")
+
+    assert globs_for(calls, "file_detail", "ignore_globs") == [EXPECTED_IGNORE]
+    assert globs_for(calls, "file_detail", "include_globs") == [['*.py']]

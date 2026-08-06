@@ -76,8 +76,8 @@ def get_repo_details(repo_name):
     for repo in repos.repos:
         if repo._repo_name() == repo_name:
             df = repo.file_detail(
-                include_globs=['*.%s' % (x, ) for x in extensions],
-                ignore_globs=['*/%s/*' % (x, ) for x in ignore_dir]
+                include_globs=include_globs(extensions),
+                ignore_globs=ignore_globs(ignore_dir)
             )
             df = df.reset_index()
             df = df.sort_values(by=['loc'], ascending=False)
