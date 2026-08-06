@@ -9,7 +9,7 @@
 
 from gitnoc.services.metrics import *
 from gitnoc.utils import render_wrapper
-from flask import Blueprint
+from flask import Blueprint, jsonify
 
 __author__ = 'willmcginnis'
 
@@ -32,7 +32,7 @@ def punchchard_data():
     branch = settings.get('branch', 'master')
 
     output = get_punchcard(project_dir, extensions, ignore_dir, branch)
-    return str(output)
+    return jsonify(output)
 
 
 @blueprint.route('/repo_details/<repo_name>/', methods=["GET"])
