@@ -149,7 +149,7 @@ def test_ignore_file_works_for_newly_created_profile(settings_env):
 
     settings_env.module.create_profile("new")
     settings_env.module.change_profile("new")
-    assert settings_env.module.ignore_file("src-vendor-lib") is True
+    assert settings_env.module.ignore_file("src/vendor/lib") is True
 
     assert settings_env.read()[0]["ignore_dir"] == ["src/vendor/lib"]
 
@@ -161,7 +161,7 @@ def test_ignore_file_normalizes_legacy_ignore_dir(settings_env, legacy_ignore_di
         profile["ignore_dir"] = legacy_ignore_dir
     settings_env.write([profile])
 
-    assert settings_env.module.ignore_file("src-vendor-lib") is True
+    assert settings_env.module.ignore_file("src/vendor/lib") is True
 
     assert settings_env.read()[0]["ignore_dir"] == ["src/vendor/lib"]
 
@@ -172,12 +172,31 @@ def test_ignore_file_appends_to_existing_list(settings_env):
         {"profile_name": "b", "current_profile": True, "ignore_dir": ["build"]},
     ])
 
-    assert settings_env.module.ignore_file("src-vendor-lib") is True
+    assert settings_env.module.ignore_file("src/vendor/lib") is True
 
     by_name = {c["profile_name"]: c for c in settings_env.read()}
-    # Dashes in the encoded path are turned back into path separators.
     assert by_name["b"]["ignore_dir"] == ["build", "src/vendor/lib"]
     assert by_name["a"]["ignore_dir"] == []
+
+
+@pytest.mark.parametrize("path", [
+    "requirements-dev.txt",
+    "docker-compose.yml",
+    "src/my-app/main.py",
+    "src/vendor/lib",
+])
+def test_ignore_file_stores_the_path_verbatim(settings_env, path):
+    """Hyphens are part of the filename, not an encoded path separator.
+
+    The stored entry has to name a path that exists in the repository, or the
+    file is never excluded and the profile collects junk the user must hand-edit
+    out.
+    """
+    settings_env.write([{"profile_name": "a", "current_profile": True, "ignore_dir": []}])
+
+    assert settings_env.module.ignore_file(path) is True
+
+    assert settings_env.read()[0]["ignore_dir"] == [path]
 
 
 # --- fresh checkout (no settings.json) --------------------------------------
@@ -228,7 +247,7 @@ def test_update_profile_on_fresh_checkout_does_not_raise(settings_env):
 
 
 def test_ignore_file_on_fresh_checkout_is_a_no_op(settings_env):
-    assert settings_env.module.ignore_file("src-vendor-lib") is True
+    assert settings_env.module.ignore_file("src/vendor/lib") is True
     # No profile to ignore for, so no bogus settings file is left behind.
     assert not settings_env.path.exists()
 
@@ -237,7 +256,7 @@ def test_ignore_file_without_current_profile_leaves_file_untouched(settings_env)
     settings_env.write([{"profile_name": "a", "current_profile": False, "ignore_dir": []}])
     before = settings_env.path.read_bytes()
 
-    assert settings_env.module.ignore_file("src-vendor-lib") is True
+    assert settings_env.module.ignore_file("src/vendor/lib") is True
 
     assert settings_env.path.read_bytes() == before
 
@@ -310,7 +329,7 @@ def test_ignore_file_preserves_other_profile_values(settings_env):
          "extensions": ["js"], "ignore_dir": ["build"], "branch": "dev"},
     ])
 
-    settings_env.module.ignore_file("src-vendor-lib")
+    settings_env.module.ignore_file("src/vendor/lib")
 
     by_name = {c["profile_name"]: c for c in settings_env.read()}
     assert by_name["a"]["ignore_dir"] == ["vendor"]

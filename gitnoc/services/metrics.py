@@ -94,7 +94,6 @@ def get_repo_details(repo_name):
                     'owner': df.loc[idx, 'file_owner'],
                     'extension': df.loc[idx, 'ext'],
                     'last_edit': df.loc[idx, 'last_edit_date'].strftime('%H:%M %d-%m-%Y'),
-                    'clean_file_name': df.loc[idx, 'file'].replace('/', '-')
                 })
 
     return out

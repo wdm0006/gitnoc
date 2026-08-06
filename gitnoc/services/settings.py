@@ -173,7 +173,7 @@ def ignore_file(file_name):
     for config in configs:
         if config.get('current_profile', False):
             config['ignore_dir'] = config.get('ignore_dir') or []
-            config['ignore_dir'].append(file_name.replace('-', '/'))
+            config['ignore_dir'].append(file_name)
             changed = True
         out.append(config)
     # With no profile to ignore the file for there is nothing to persist, so

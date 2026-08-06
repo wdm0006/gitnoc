@@ -278,7 +278,6 @@ def test_repo_details_use_git_pandas_file_detail_contract(cache_env):
         'owner': 'api',
         'extension': 'py',
         'last_edit': '12:00 01-01-2024',
-        'clean_file_name': 'api.py',
     }]
     with pytest.raises(TypeError):
         repo.file_detail(extensions=['py'])

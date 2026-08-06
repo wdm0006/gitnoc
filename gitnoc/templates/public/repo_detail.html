@@ -23,7 +23,7 @@
                 <th>{{ x.loc }}</th>
                 <th>{{ x.owner }}</th>
                 <th>{{ x.extension }}</th>
-                <th><a class="btn btn-md btn-success" href="{{ url_for('admin.ignore_file', file_name=x.clean_file_name) }}" onclick="return confirm('Are you sure?')">Ignore</a></th>
+                <th><a class="btn btn-md btn-success" href="{{ url_for('admin.ignore_file', file_name=x.file_name) }}" onclick="return confirm('Are you sure?')">Ignore</a></th>
             </tr>
             {% endfor %}
           </tbody>
