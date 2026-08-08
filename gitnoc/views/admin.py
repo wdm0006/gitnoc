@@ -84,7 +84,7 @@ def redirect_url(default='index'):
            url_for(default)
 
 
-@blueprint.route('/ignore_file/<file_name>/', methods=["GET", "POST"])
+@blueprint.route('/ignore_file/<path:file_name>/', methods=["GET", "POST"])
 def ignore_file(file_name):
     settings_services.ignore_file(file_name)
     return redirect(redirect_url())
