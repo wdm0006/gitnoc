@@ -8,7 +8,11 @@
 """
 
 from flask import Blueprint, redirect, url_for
-from gitnoc.services.cumulative_blame import *
+import json
+
+from gitnoc.services.artifact_paths import cumulative_blame_artifact_path
+from gitnoc.services.cumulative_blame import cumulative_blame
+from gitnoc.services.settings import get_settings
 from gitnoc.utils import render_wrapper
 
 __author__ = 'willmcginnis'
@@ -23,10 +27,10 @@ def blame():
 
 @blueprint.route('/cumulative_author_blame_data', methods=['GET'])
 def cumulative_author_blame_data():
-    filename = get_file_prefix() + 'cumulative_author_blame.json'
+    path = cumulative_blame_artifact_path(get_settings().get('profile_name', 'default'), 'cumulative_author_blame.json')
     try:
-        return json.dumps(json.load(open(str(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'r')))
-    except FileNotFoundError as e:
+        return json.dumps(json.load(open(path, 'r')))
+    except FileNotFoundError:
         return '{}'
 
 
@@ -43,10 +47,10 @@ def cumulative_author_blame():
 
 @blueprint.route('/cumulative_project_blame_data', methods=['GET'])
 def cumulative_project_blame_data():
-    filename = get_file_prefix() + 'cumulative_project_blame.json'
+    path = cumulative_blame_artifact_path(get_settings().get('profile_name', 'default'), 'cumulative_project_blame.json')
     try:
-        return json.dumps(json.load(open(str(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + os.sep + 'static' + os.sep + 'data' + os.sep + filename, 'r')))
-    except FileNotFoundError as e:
+        return json.dumps(json.load(open(path, 'r')))
+    except FileNotFoundError:
         return '{}'
 
 

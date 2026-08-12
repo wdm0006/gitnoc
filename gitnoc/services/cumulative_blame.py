@@ -3,18 +3,14 @@ import json
 import tempfile
 from gitnoc.app import gp_cache
 from gitpandas import ProjectDirectory
-from .settings import get_settings, get_file_prefix
+from .settings import get_settings
+from .artifact_paths import cumulative_blame_artifact_path
 from .globs import ignore_globs, include_globs
 
 __author__ = 'willmcginnis'
 
 
-def _artifact_path(filename):
-    bp = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    return bp + os.sep + 'static' + os.sep + 'data' + os.sep + filename
-
-
-def _write_artifact(filename, data):
+def _write_artifact(path, data):
     """Serialize to a sibling temp file, then atomically rename it into place.
 
     Dumping straight into ``open(path, 'w')`` truncates the live artifact before
@@ -22,8 +18,7 @@ def _write_artifact(filename, data):
     only handle a missing file -- can observe a partial document, and a failed
     dump destroys the last usable result.
     """
-    path = _artifact_path(filename)
-    fd, tmp_path = tempfile.mkstemp(dir=os.path.dirname(path), prefix=filename + '.', suffix='.tmp')
+    fd, tmp_path = tempfile.mkstemp(dir=os.path.dirname(path), prefix=os.path.basename(path) + '.', suffix='.tmp')
     try:
         with os.fdopen(fd, 'w') as tmp_file:
             json.dump(data, tmp_file, indent=4)
@@ -57,6 +52,6 @@ def cumulative_blame(by, file_stub):
         d3_data.append(blob)
 
     # dump the data to disk
-    _write_artifact(get_file_prefix() + file_stub, d3_data)
+    _write_artifact(cumulative_blame_artifact_path(settings.get('profile_name', 'default'), file_stub), d3_data)
 
     return True

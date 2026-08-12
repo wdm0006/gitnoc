@@ -5,6 +5,7 @@ Same recorder pattern as ``test_service_branch.py``: stub each module's
 real service functions, and assert on the glob lists git-pandas would receive.
 """
 from gitnoc.services import cumulative_blame as cumulative_blame_service
+from gitnoc.services import artifact_paths
 from gitnoc.services import file_change_rates as file_change_rates_service
 from gitnoc.services import metrics as metrics_service
 
@@ -112,7 +113,7 @@ def _redirect_blame_output(base_dir, monkeypatch):
     """Keep ``cumulative_blame``'s artifact write inside the temp dir."""
     fake_file = base_dir / "gitnoc" / "services" / "cumulative_blame.py"
     (base_dir / "gitnoc" / "static" / "data").mkdir(parents=True, exist_ok=True)
-    monkeypatch.setattr(cumulative_blame_service, "__file__", str(fake_file))
+    monkeypatch.setattr(artifact_paths, "__file__", str(fake_file))
 
 
 # --- the five analytics services --------------------------------------------
