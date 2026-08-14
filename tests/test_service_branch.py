@@ -10,6 +10,7 @@ frames below return just enough surface for each service to run to completion.
 """
 from gitnoc.services import metrics as metrics_service
 from gitnoc.services import cumulative_blame as cumulative_blame_service
+from gitnoc.services import artifact_paths
 
 
 # --- minimal DataFrame-ish fakes -------------------------------------------
@@ -130,7 +131,7 @@ def _redirect_blame_output(cumulative_module, base_dir, monkeypatch):
     """
     fake_file = base_dir / "gitnoc" / "services" / "cumulative_blame.py"
     (base_dir / "gitnoc" / "static" / "data").mkdir(parents=True, exist_ok=True)
-    monkeypatch.setattr(cumulative_module, "__file__", str(fake_file))
+    monkeypatch.setattr(artifact_paths, "__file__", str(fake_file))
 
 
 def test_cumulative_blame_uses_configured_branch(settings_env, tmp_path, monkeypatch):
