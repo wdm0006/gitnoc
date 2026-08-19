@@ -7,9 +7,10 @@ uses Flask's ``path`` converter, so these tests drive the real blueprint's URL
 map: the value the template hands ``url_for`` has to come back out of the
 matched URL unchanged, and reach the settings service verbatim.
 
-``views.admin`` pulls in the WTForms stack, which is not a test dependency, so
-that one module is stubbed before the import.  Everything under test -- the
-route rule, the view, and the template's link expression -- is the real thing.
+``views.admin`` pulls in the WTForms stack; it is stubbed when that stack is not
+installed so this module still runs on a bare ``pip install pytest Flask``.
+Everything under test -- the route rule, the view, and the template's link
+expression -- is the real thing either way.
 """
 import os
 import re
@@ -21,7 +22,13 @@ import pytest
 flask = pytest.importorskip("flask")
 
 
-if "gitnoc.forms.public" not in sys.modules:
+try:
+    import flask_wtf  # noqa: F401
+    _has_wtforms = True
+except ImportError:
+    _has_wtforms = False
+
+if not _has_wtforms and "gitnoc.forms.public" not in sys.modules:
     _forms_stub = types.ModuleType("gitnoc.forms.public")
 
     class _Form:

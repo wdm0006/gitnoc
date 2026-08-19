@@ -1,10 +1,10 @@
 """Analytics cache entries must be isolated per input and per profile.
 
-Flask-Cache treats a literal ``key_prefix`` as the whole cache key, so the four
+Flask-Caching treats a literal ``key_prefix`` as the whole cache key, so the four
 metrics services used to share one entry each: every ``repo_name`` collided on
 ``metrics_repo_details_``, and none of the keys mentioned the active profile.
 These tests drive the real service functions through GitNOC's own caching
-adapter (``services.analytics_cache``), standing in only for the Flask-Cache
+adapter (``services.analytics_cache``), standing in only for the Flask-Caching
 backend itself.
 """
 import datetime
@@ -23,11 +23,11 @@ PROFILE = {
 
 
 class RecordingCache:
-    """Flask-Cache stand-in with the same literal-key semantics.
+    """Flask-Caching stand-in with the same literal-key semantics.
 
     ``cached`` uses ``key_prefix`` verbatim as the cache key (calling it first
     if it is a callable) and never mixes in the wrapped function's arguments --
-    exactly what the real 0.13 implementation does.
+    exactly what the real implementation does.
     """
 
     def __init__(self):

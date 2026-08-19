@@ -7,7 +7,7 @@
 
 """
 from gitpandas.cache import RedisDFCache
-from flask_cache import Cache
+from flask_caching import Cache
 
 
 __author__ = 'willmcginnis'
