@@ -2,6 +2,8 @@ from flask_wtf import Form
 from wtforms import StringField, SelectField
 from wtforms.validators import DataRequired
 
+from gitnoc.services.settings import parse_project_dir
+
 __author__ = 'willmcginnis'
 
 
@@ -33,10 +35,7 @@ class SettingsForm(Form):
         if not initial_validation:
             return False
 
-        self.project_directory.data = [str(x).strip() for x in self.project_directory.data.split(',')]
-        if len(self.project_directory.data) == 1:
-            if self.project_directory.data[0][-1] == '/':
-                self.project_directory.data = self.project_directory.data[0]
+        self.project_directory.data = parse_project_dir(self.project_directory.data)
 
         if self.extensions.data is not None:
             self.extensions.data = [str(x).strip() for x in self.extensions.data.split(',')]

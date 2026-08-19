@@ -23,6 +23,26 @@ def default_settings():
     }
 
 
+def parse_project_dir(raw):
+    """Parse the comma-separated project directory setting into git-pandas' shape.
+
+    git-pandas gives ``ProjectDirectory(working_dir=...)`` two different meanings:
+    a string is a directory to walk for repositories, while every entry of a list
+    must already *be* a repository.  A single path works as a string either way --
+    whether it names a container directory or a repository itself -- so one entry
+    is always returned as a string, and only two or more become a list.
+    """
+    if raw is None:
+        return None
+    entries = raw.split(',') if isinstance(raw, str) else list(raw)
+    entries = [x for x in (str(entry).strip() for entry in entries) if x]
+    if not entries:
+        return None
+    if len(entries) == 1:
+        return entries[0]
+    return entries
+
+
 def normalize_settings(config):
     """Fill missing keys and coerce ``None`` extensions/ignore_dir to ``[]``.
 
@@ -32,8 +52,9 @@ def normalize_settings(config):
     """
     settings = default_settings()
     settings.update({k: v for k, v in config.items() if v is not None})
-    if not settings.get('project_dir'):
-        settings['project_dir'] = os.getcwd()
+    # A profile saved as a one-element list finds no repositories at all, so
+    # collapse it here too rather than making the operator re-save the profile.
+    settings['project_dir'] = parse_project_dir(settings.get('project_dir')) or os.getcwd()
     for key in ('extensions', 'ignore_dir'):
         if settings.get(key) is None:
             settings[key] = []
