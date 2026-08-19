@@ -1,4 +1,4 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField
 from wtforms.validators import DataRequired
 
@@ -7,21 +7,21 @@ from gitnoc.services.settings import parse_project_dir
 __author__ = 'willmcginnis'
 
 
-class ProfileForm(Form):
+class ProfileForm(FlaskForm):
     profile = SelectField('Profile')
 
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
 
 
-class CreateProfileForm(Form):
+class CreateProfileForm(FlaskForm):
     name = StringField('Profile Name')
 
     def __init__(self, *args, **kwargs):
         super(CreateProfileForm, self).__init__(*args, **kwargs)
 
 
-class SettingsForm(Form):
+class SettingsForm(FlaskForm):
     project_directory = StringField('Project Directory (absolute path)', validators=[DataRequired()])
     extensions = StringField('Extensions to Report On')
     ignore_dir = StringField('Directories to Ignore')
@@ -30,8 +30,8 @@ class SettingsForm(Form):
     def __init__(self, *args, **kwargs):
         super(SettingsForm, self).__init__(*args, **kwargs)
 
-    def validate(self):
-        initial_validation = super(SettingsForm, self).validate()
+    def validate(self, extra_validators=None):
+        initial_validation = super(SettingsForm, self).validate(extra_validators=extra_validators)
         if not initial_validation:
             return False
 

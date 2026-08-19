@@ -19,7 +19,7 @@ blueprint = Blueprint('admin', __name__, static_folder="../static")
 
 @blueprint.route('/settings', methods=["GET", "POST"])
 def settings():
-    form = SettingsForm(request.form, csrf_enabled=False)
+    form = SettingsForm(request.form, meta={'csrf': False})
     if form.validate_on_submit():
         settings_services.update_profile(form.project_directory.data, form.extensions.data, form.ignore_dir.data, form.branch.data)
 

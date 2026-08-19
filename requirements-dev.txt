@@ -1,6 +1,10 @@
 # Development / test dependencies.
 # The service tests are intentionally decoupled from the runtime stack (redis,
 # git-pandas) via stubs in tests/conftest.py.  Flask is needed on top of pytest
-# because the route tests bind the real blueprint and exercise its responses.
+# because the route tests bind the real blueprint and exercise its responses,
+# and the form layer (Flask-WTF / WTForms) so the /settings POST is exercised
+# against the real validation path rather than a stub.
 pytest>=7.0
 Flask
+Flask-WTF>=1.2
+WTForms>=3.1

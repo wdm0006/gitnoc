@@ -1,15 +1,12 @@
-Flask
+Flask>=3.0
+click>=8.1
 git+https://github.com/wdm0006/git-pandas.git
-Flask-WTF==0.11
-WTForms==2.0.2
-wtforms-components
-Redis >= 2.6.0
-rq
-Flask-Cache
-redislite
-pandas>=0.17.0
-Flask-Script
-Flask-Assets==0.10
+Flask-WTF>=1.2
+WTForms>=3.1
+Flask-Caching>=2.1
+Flask-Assets>=2.1
+Redis>=5.0
+rq>=2.0
+pandas>=2.2.2
 cssmin>=0.2.0
-jsmin>=2.0.11
-requests
+jsmin>=3.0.1

@@ -1,10 +1,10 @@
-"""Deterministic Flask-Cache keys for the analytics services.
+"""Deterministic Flask-Caching keys for the analytics services.
 
-Flask-Cache treats a literal ``key_prefix`` as the *complete* cache key: it
+Flask-Caching treats a literal ``key_prefix`` as the *complete* cache key: it
 never mixes in the decorated function's arguments, and a callable ``key_prefix``
 is invoked with no arguments at all.  ``cached_analytics`` therefore builds the
 key itself -- from the bound call arguments plus the analytics fields of the
-active profile -- and hands Flask-Cache a callable that returns that
+active profile -- and hands Flask-Caching a callable that returns that
 already-computed key.
 """
 import functools

@@ -38,7 +38,7 @@ def cumulative_author_blame_data():
 def cumulative_author_blame():
     from gitnoc.app import q
     if q is not None:
-        q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json', timeout=60000)
+        q.enqueue(cumulative_blame, 'committer', 'cumulative_author_blame.json', job_timeout=60000)
     else:
         cumulative_blame('committer', 'cumulative_author_blame.json')
 
@@ -58,7 +58,7 @@ def cumulative_project_blame_data():
 def cumulative_project_blame():
     from gitnoc.app import q
     if q is not None:
-        q.enqueue(cumulative_blame, 'project', 'cumulative_project_blame.json', timeout=60000)
+        q.enqueue(cumulative_blame, 'project', 'cumulative_project_blame.json', job_timeout=60000)
     else:
         cumulative_blame('project', 'cumulative_project_blame.json')
 

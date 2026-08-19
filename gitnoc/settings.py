@@ -20,9 +20,9 @@ class LocalDevConfig(Config):
     DEBUG = True
     REDIS_URL = 'redis://localhost:6379/0'
     QUEUES = ['default']
-    CACHE_TYPE = 'redis'
+    CACHE_TYPE = 'RedisCache'
     CACHE_REDIS_HOST = "localhost"
-    CACHE_REDIS_PORT = "6379"
+    CACHE_REDIS_PORT = 6379
 
 
 class DockerConfig(Config):
@@ -30,6 +30,6 @@ class DockerConfig(Config):
     DEBUG = False
     REDIS_URL = 'redis://redis:6379/0'
     QUEUES = ['default']
-    CACHE_TYPE = 'redis'
+    CACHE_TYPE = 'RedisCache'
     CACHE_REDIS_HOST = "redis"
-    CACHE_REDIS_PORT = "6379"
+    CACHE_REDIS_PORT = 6379
