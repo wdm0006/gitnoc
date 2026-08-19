@@ -18,7 +18,7 @@ class Config(object):
 class LocalDevConfig(Config):
     ASSETS_DEBUG = True
     DEBUG = True
-    REDIS_URL = 'http://localhost:6379/'
+    REDIS_URL = 'redis://localhost:6379/0'
     QUEUES = ['default']
     CACHE_TYPE = 'redis'
     CACHE_REDIS_HOST = "localhost"
