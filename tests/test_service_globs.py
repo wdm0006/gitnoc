@@ -78,6 +78,9 @@ def make_recorder():
         def _repo_name(self):
             return "api"
 
+        def has_coverage(self):
+            return False
+
         def file_detail(self, include_globs=None, ignore_globs=None, rev="HEAD", committer=True):
             calls.append(("file_detail", {'include_globs': include_globs, 'ignore_globs': ignore_globs}))
             return FakeFrame()
