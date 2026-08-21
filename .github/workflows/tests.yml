@@ -70,3 +70,26 @@ jobs:
 
       - name: Print the route table
         run: python manage.py urls
+
+  docker:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the application image
+        run: docker build --tag gitnoc-ci .
+
+      - name: Smoke-test the built image
+        run: docker run --rm --network host gitnoc-ci python ci/check_runtime_stack.py

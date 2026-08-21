@@ -1,11 +1,15 @@
-FROM continuumio/miniconda3:latest
+FROM python:3.12-slim
 
-ADD . /gitnoc
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /gitnoc
 
-# Add conda-forge channel
-RUN conda config --add channels conda-forge && conda env create -n gitnoc
-RUN apt-get install node && npm install -g bower && bower install
+COPY requirements.txt /gitnoc/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# activate the app environment
-ENV PATH /opt/conda/envs/gitnoc/bin:$PATH
+COPY . /gitnoc
+
+EXPOSE 5050
+
+CMD ["python", "manage.py", "server-prod"]

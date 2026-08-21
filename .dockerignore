@@ -1,0 +1,8 @@
+.git
+.github
+.pytest_cache
+.venv
+__pycache__
+*.py[cod]
+gitnoc/settings.json
+gitnoc/static/data
