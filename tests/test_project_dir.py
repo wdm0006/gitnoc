@@ -60,7 +60,7 @@ class _StubForm(object):
     def __init__(self, *args, **kwargs):
         pass
 
-    def validate(self):
+    def validate(self, extra_validators=None):
         return True
 
 
@@ -78,7 +78,7 @@ def _load_forms_module():
     validators = types.ModuleType('wtforms.validators')
     validators.DataRequired = lambda *args, **kwargs: None
     flask_wtf = types.ModuleType('flask_wtf')
-    flask_wtf.Form = _StubForm
+    flask_wtf.FlaskForm = _StubForm
     stubs['wtforms'] = wtforms
     stubs['wtforms.validators'] = validators
     stubs['flask_wtf'] = flask_wtf

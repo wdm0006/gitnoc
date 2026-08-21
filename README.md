@@ -46,12 +46,12 @@ TODO:
 How to Use
 ==========
 
-Docker compose is used to orchestrate the workers, redis and the flask
-app.  Assuming you have a docker-machine called default running, you can
-run the whole app with:
+Docker Compose is used to orchestrate the web app, worker, and Redis. With a
+current Docker installation, start the whole stack from the checkout with:
 
-    docker-compose up
-    open http://$(docker-machine ip default):5050
+    docker compose up --build
+
+Then open http://localhost:5050.
 
 This won't have access to the local file system, so will only work with
 remote git repos. Future work is around making that process nicer, with
