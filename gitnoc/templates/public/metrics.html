@@ -20,9 +20,13 @@
                 <tbody>
                 {% for x in leaderboard.top_committers %}
                     <tr>
-                        <th>{{ x.rank }}</th>
-                        <th>{{ x.label }}</th>
-                        <th>{{ x.net }}</th>
+                        <td>{{ x.rank }}</td>
+                        <td>{{ x.label }}</td>
+                        <td>{{ x.net }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-muted">No commits in the past 21 days on the profile's branch &mdash; check the profile's project directory and branch in <a href="{{ url_for('admin.settings') }}">Settings</a>.</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -34,16 +38,20 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>Committer</th>
+                    <th>Extension</th>
                     <th>Net Change</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for x in leaderboard.top_extensions %}
                     <tr>
-                        <th>{{ x.rank }}</th>
-                        <th>*.{{ x.label }}</th>
-                        <th>{{ x.net }}</th>
+                        <td>{{ x.rank }}</td>
+                        <td>*.{{ x.label }}</td>
+                        <td>{{ x.net }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-muted">No commits in the past 21 days on the profile's branch &mdash; check the profile's project directory and branch in <a href="{{ url_for('admin.settings') }}">Settings</a>.</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -55,16 +63,20 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>Committer</th>
+                    <th>Repository</th>
                     <th>Net Change</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for x in leaderboard.top_repositories %}
                     <tr>
-                        <th>{{ x.rank }}</th>
-                        <th>{{ x.label }}</th>
-                        <th>{{ x.net }}</th>
+                        <td>{{ x.rank }}</td>
+                        <td>{{ x.label }}</td>
+                        <td>{{ x.net }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-muted">No commits in the past 21 days on the profile's branch &mdash; check the profile's project directory and branch in <a href="{{ url_for('admin.settings') }}">Settings</a>.</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -95,9 +107,9 @@
                         <tbody>
                         {% for x in repo_names %}
                             <tr>
-                                <th>{{ x }}</th>
-                                <th><a class="btn btn-md btn-success"
-                                       href="{{ url_for('metrics.repo_details', repo_name=x) }}">details</a></th>
+                                <td>{{ x }}</td>
+                                <td><a class="btn btn-md btn-success"
+                                       href="{{ url_for('metrics.repo_details', repo_name=x) }}">details</a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
