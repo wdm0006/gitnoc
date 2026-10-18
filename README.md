@@ -49,7 +49,14 @@ How to Use
 Docker Compose is used to orchestrate the web app, worker, and Redis. With a
 current Docker installation, start the whole stack from the checkout with:
 
+    export GITNOC_SECRET_KEY="$(uv run --no-project python -c 'import secrets; print(secrets.token_hex(32))')"
     docker compose up --build
+
+Keep this secret stable across restarts and share it between web and worker.
+Docker startup rejects a missing or empty `GITNOC_SECRET_KEY`. Changing it
+invalidates existing sessions and CSRF tokens. Local development (`server-dev`)
+uses a temporary random key with a warning when the variable is absent; set the
+variable there too if sessions should survive restarts.
 
 Then open http://localhost:5050.
 

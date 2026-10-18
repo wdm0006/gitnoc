@@ -42,6 +42,11 @@ def main():
 
     from gitnoc.app import create_app
     app = create_app('dev')
+    secret = os.environ.get('GITNOC_SECRET_KEY')
+    if secret:
+        for configured_app in (app, create_app('prod')):
+            if configured_app.config['SECRET_KEY'] != secret:
+                raise AssertionError('the app must use GITNOC_SECRET_KEY')
 
     missing = EXPECTED_ROUTES - {rule.rule for rule in app.url_map.iter_rules()}
     if missing:
