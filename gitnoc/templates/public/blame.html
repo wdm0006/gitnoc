@@ -9,6 +9,7 @@
     <div class="row">
         <h3>Authors</h3>
         <a href="{{url_for('blame.cumulative_author_blame')}}"><button onclick="backgroundTaskAlert()">Refresh</button></a>
+        <p class="text-muted blame-empty-hint" id="empty_cumulative_author_blame" style="display:none">No data yet &mdash; click Refresh, then reload this page in a few minutes.</p>
         <div id="chart_cumulative_author_blame" style="width:100%">
             <svg style="height:500px; width:100%"></svg>
         </div>
@@ -17,6 +18,7 @@
     <div class="row">
         <h3>Projects</h3>
         <a href="{{url_for('blame.cumulative_project_blame')}}"><button onclick="backgroundTaskAlert()">Refresh</button></a>
+        <p class="text-muted blame-empty-hint" id="empty_cumulative_project_blame" style="display:none">No data yet &mdash; click Refresh, then reload this page in a few minutes.</p>
         <div id="chart_cumulative_project_blame" style="width:100%">
             <svg style="height:500px; width:100%"></svg>
         </div>

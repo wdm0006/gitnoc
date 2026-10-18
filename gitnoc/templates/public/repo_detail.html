@@ -5,7 +5,7 @@
     <h2>File Detail <small>{{ repo_name }}</small></h2>
     <hr>
     <div class="col-lg-12">
-        <h3>Top Committers</h3>
+        <h3>Files</h3>
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -19,11 +19,11 @@
           <tbody>
             {% for x in file_details %}
             <tr>
-                <th>{{ x.file_name }}</th>
-                <th>{{ x.loc }}</th>
-                <th>{{ x.owner }}</th>
-                <th>{{ x.extension }}</th>
-                <th><a class="btn btn-md btn-success" href="{{ url_for('admin.ignore_file', file_name=x.file_name) }}" onclick="return confirm('Are you sure?')">Ignore</a></th>
+                <td>{{ x.file_name }}</td>
+                <td>{{ x.loc }}</td>
+                <td>{{ x.owner }}</td>
+                <td>{{ x.extension }}</td>
+                <td><a class="btn btn-md btn-success" href="{{ url_for('admin.ignore_file', file_name=x.file_name) }}" onclick="return confirm('Are you sure?')">Ignore</a></td>
             </tr>
             {% endfor %}
           </tbody>
