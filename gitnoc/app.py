@@ -18,16 +18,15 @@ q = None
 
 def create_app(env='dev'):
     app = Flask(__name__)
-    app.secret_key = 'CHANGEME'
 
     directory = str(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'static' + os.sep + 'data'
     if not os.path.exists(directory):
         os.makedirs(directory)
 
     if env == 'dev':
-        app.config.from_object(LocalDevConfig)
+        app.config.from_object(LocalDevConfig())
     else:
-        app.config.from_object(DockerConfig)
+        app.config.from_object(DockerConfig())
 
     register_extensions(app)
     register_blueprints(app)

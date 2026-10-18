@@ -39,6 +39,8 @@ jobs:
     # green over a stack that cannot import at all.  This job installs the real
     # requirements.txt and composes the app for real.
     runs-on: ubuntu-latest
+    env:
+      GITNOC_SECRET_KEY: gitnoc-ci-only-signing-key
 
     services:
       redis:
@@ -73,6 +75,8 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
+    env:
+      GITNOC_SECRET_KEY: gitnoc-ci-only-signing-key
 
     services:
       redis:
@@ -92,4 +96,4 @@ jobs:
         run: docker build --tag gitnoc-ci .
 
       - name: Smoke-test the built image
-        run: docker run --rm --network host gitnoc-ci python ci/check_runtime_stack.py
+        run: docker run --rm --network host --env GITNOC_SECRET_KEY gitnoc-ci python ci/check_runtime_stack.py

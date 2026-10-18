@@ -5,6 +5,7 @@ services:
     container_name: gitnoc_web
     environment:
       GITNOC_REDIS_HOST: redis
+      GITNOC_SECRET_KEY: ${GITNOC_SECRET_KEY:?set a secret}
     command: python manage.py server-prod
     ports:
     - "5050:5050"
@@ -19,6 +20,7 @@ services:
     container_name: gitnoc_worker
     environment:
       GITNOC_REDIS_HOST: redis
+      GITNOC_SECRET_KEY: ${GITNOC_SECRET_KEY:?set a secret}
     command: python manage.py runworker
     volumes:
     - .:/gitnoc
