@@ -1,6 +1,6 @@
 Flask>=3.0
 click>=8.1
-git+https://github.com/wdm0006/git-pandas.git
+git-pandas>=2.6.0
 Flask-WTF>=1.2
 WTForms>=3.1
 Flask-Caching>=2.1
