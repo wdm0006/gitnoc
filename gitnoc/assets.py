@@ -5,6 +5,7 @@ css = Bundle(
     "./bower_components/nvd3/build/nv.d3.min.css",
     "./bower_components/datatables/media/css/jquery.dataTables.min.css",
     "./bower_components/datatables-buttons/css/buttons.dataTables.scss",
+    "./css/tokens.css",
     "./css/main.css",
     filters="cssmin",
     output="public/css/common.css"

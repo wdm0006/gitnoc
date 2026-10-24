@@ -8,7 +8,7 @@
 
 body {
   font-style:normal;
-  font-family:"BrandonText-Regular", sans-serif;
+  font-family: var(--font-sans);
 }
 
 #mychart {
