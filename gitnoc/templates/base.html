@@ -24,24 +24,11 @@
 {% include "nav.html" %}
 {% endwith %}
 <header>{% block header %}{% endblock %}</header>
-<div class="{% block content_class %}container{% endblock content_class %}">
+<div class="{% block content_class %}container page{% endblock content_class %}">
     <div role="main">
-    <div class="cs-loader">
-      <div class="cs-loader-inner">
-        <label>	●</label>
-        <label>	●</label>
-        <label>	●</label>
-        <label>	●</label>
-        <label>	●</label>
-        <label>	●</label>
-      </div>
-    </div>
         {% block content %}{% endblock %}
     </div>
 </div>
-<br>
-<br>
-<hr>
 {% include "footer.html" %}
 {% assets "js_all" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
