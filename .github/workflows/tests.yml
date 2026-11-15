@@ -11,7 +11,8 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Python 3.9 has no build for ubuntu-latest (now 26.04), so pin the image.
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
