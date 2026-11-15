@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-    <br><br><br>
     <h1>Metrics</h1>
     <div class="row">
         <h2>Leaderboard
@@ -14,15 +13,15 @@
                 <tr>
                     <th>#</th>
                     <th>Committer</th>
-                    <th>Net Change</th>
+                    <th class="num">Net Change</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for x in leaderboard.top_committers %}
                     <tr>
                         <td>{{ x.rank }}</td>
-                        <td>{{ x.label }}</td>
-                        <td>{{ x.net }}</td>
+                        <td class="mono">{{ x.label }}</td>
+                        <td class="num">{{ x.net }}</td>
                     </tr>
                 {% else %}
                     <tr>
@@ -39,15 +38,15 @@
                 <tr>
                     <th>#</th>
                     <th>Extension</th>
-                    <th>Net Change</th>
+                    <th class="num">Net Change</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for x in leaderboard.top_extensions %}
                     <tr>
                         <td>{{ x.rank }}</td>
-                        <td>*.{{ x.label }}</td>
-                        <td>{{ x.net }}</td>
+                        <td class="mono">*.{{ x.label }}</td>
+                        <td class="num">{{ x.net }}</td>
                     </tr>
                 {% else %}
                     <tr>
@@ -64,15 +63,15 @@
                 <tr>
                     <th>#</th>
                     <th>Repository</th>
-                    <th>Net Change</th>
+                    <th class="num">Net Change</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for x in leaderboard.top_repositories %}
                     <tr>
                         <td>{{ x.rank }}</td>
-                        <td>{{ x.label }}</td>
-                        <td>{{ x.net }}</td>
+                        <td class="mono">{{ x.label }}</td>
+                        <td class="num">{{ x.net }}</td>
                     </tr>
                 {% else %}
                     <tr>
@@ -107,8 +106,8 @@
                         <tbody>
                         {% for x in repo_names %}
                             <tr>
-                                <td>{{ x }}</td>
-                                <td><a class="btn btn-md btn-success"
+                                <td class="mono">{{ x }}</td>
+                                <td><a class="btn btn-md btn-secondary"
                                        href="{{ url_for('metrics.repo_details', repo_name=x) }}">details</a></td>
                             </tr>
                         {% endfor %}
