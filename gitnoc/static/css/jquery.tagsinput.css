@@ -1,50 +1,64 @@
 div.tagsinput {
-    border: 1px solid #CCC;
-    background: #FFF;
-    padding: 5px;
+    border: 1px solid var(--color-control-border);
+    background: var(--color-surface);
+    padding: var(--space-1) var(--space-2);
     width: 100%;
-    height: 100%;
-    min-height: 250px;
+    height: auto;
+    min-height: 40px;
+    max-height: 96px;
     overflow-y: auto;
-    resize: both;
-    border-radius: 2px;
+    border-radius: var(--radius-md);
+}
+
+div.tagsinput:focus-within {
+    border-color: var(--color-text);
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
 }
 
 div.tagsinput span.tag {
-    border: 1px solid #a5d24a;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
+    border: 0;
+    border-radius: var(--radius-sm);
     display: block;
     float: left;
-    padding: 5px;
-    text-decoration: none;
-    background: #cde69c;
-    color: #638421;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    font-family: helvetica;
+    padding: 2px var(--space-2);
+    background: var(--color-divider);
+    color: var(--color-text);
+    margin: 2px var(--space-1) 2px 0;
+    font-family: var(--font-mono);
     font-size: 13px;
+    line-height: 20px;
 }
 
 div.tagsinput span.tag a {
-    font-weight: bold;
-    color: #82ad2b;
+    font-weight: 600;
+    color: var(--color-text-muted);
     text-decoration: none;
-    font-size: 11px;
+    font-size: 13px;
+    margin-left: var(--space-1);
+    padding: 0 2px;
+    border-radius: var(--radius-sm);
+}
+
+div.tagsinput span.tag a:hover {
+    color: var(--color-text);
 }
 
 div.tagsinput input {
     width: 80px;
-    margin: 0px;
-    font-family: helvetica;
+    margin: 2px var(--space-1) 2px 0;
+    font-family: var(--font-mono);
     font-size: 13px;
+    line-height: 20px;
     border: 1px solid transparent;
-    padding: 5px;
+    padding: 2px var(--space-1);
     background: transparent;
-    color: #000;
-    outline: 0px;
-    margin-right: 5px;
-    margin-bottom: 5px;
+    color: var(--color-text);
+    outline: 0;
+}
+
+div.tagsinput input:focus-visible {
+    outline: 0;
 }
 
 div.tagsinput div {
